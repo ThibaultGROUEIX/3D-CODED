@@ -62,6 +62,7 @@ Require 3 GB of RAM on the GPU and 17 sec to run (Titan X Pascal).
 
 ```shell
 cd trained_models; ./download_models.sh; cd .. # download the trained models
+cd data; ./download_template.sh; cd .. # download the template
 python inference/correspondences.py
 ```
 This script takes as input 2 meshes from ```data``` and compute correspondences in ```results```. Reconstruction are saved in ```data```
