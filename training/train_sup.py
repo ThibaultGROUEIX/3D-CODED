@@ -21,7 +21,7 @@ parser.add_argument('--batchSize', type=int, default=32, help='input batch size'
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=8)
 parser.add_argument('--nepoch', type=int, default=100, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='optional reload model path')
-parser.add_argument('--env', type=str, default="3DCODED_supervised_legacydataset_reverse", help='visdom environment')
+parser.add_argument('--env', type=str, default="3DCODED_supervised", help='visdom environment')
 
 opt = parser.parse_args()
 print(opt)
