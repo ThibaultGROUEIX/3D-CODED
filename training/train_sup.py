@@ -19,9 +19,9 @@ import visdom
 parser = argparse.ArgumentParser()
 parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=8)
-parser.add_argument('--nepoch', type=int, default=60, help='number of epochs to train for')
+parser.add_argument('--nepoch', type=int, default=100, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='optional reload model path')
-parser.add_argument('--env', type=str, default="3DCODED_supervised_legacydataset_try2", help='visdom environment')
+parser.add_argument('--env', type=str, default="3DCODED_supervised_legacydataset_reverse", help='visdom environment')
 
 opt = parser.parse_args()
 print(opt)
@@ -88,10 +88,10 @@ with open(logname, 'a') as f:  # open and append
 
 # =============start of the learning loop ======================================== #
 for epoch in range(opt.nepoch):
-    if epoch==36:
+    if epoch==80:
         lrate = lrate/10.0  # learning rate scheduled decay
         optimizer = optim.Adam(network.parameters(), lr=lrate)
-    if epoch==55:
+    if epoch==90:
         lrate = lrate/10.0  # learning rate scheduled decay
         optimizer = optim.Adam(network.parameters(), lr=lrate)
 
@@ -99,14 +99,10 @@ for epoch in range(opt.nepoch):
     train_loss_L2_smpl.reset()
     network.train()
     for i, data in enumerate(dataloader, 0):
-        if i>5:
-            break
         optimizer.zero_grad()
         points, idx,_ = data
-
         points = points.transpose(2, 1).contiguous()
         points = points.cuda()
-
         pointsReconstructed = network.forward_idx(points, idx)  # forward pass
         loss_net = torch.mean(
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
