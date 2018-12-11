@@ -67,7 +67,7 @@ tmp_val_loss = AverageValueMeter()
 # ===================CREATE DATASET================================= #
 dataset = SMPL(train=True, regular = True)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
-                                         shuffle=True, num_workers=int(opt.workers))
+                                         shuffle=True, num_workers=int(opt.workers), drop_last=True)
 dataset_smpl_test = SMPL(train=False)
 dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,
                                          shuffle=False, num_workers=int(opt.workers))
