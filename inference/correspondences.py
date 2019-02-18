@@ -55,7 +55,7 @@ def compute_correspondances(source_p, source_reconstructed_p, target_p, target_r
 
         # save output
         mesh = trimesh.Trimesh(vertices=closest_points, faces=source.faces, process=False)
-        trimesh.io.export.export_mesh(mesh, "results/correspondences.ply")
+        mesh.export("results/correspondences.ply")
         np.savetxt("results/correspondences.txt", closest_points, fmt='%1.10f')
         return
 
