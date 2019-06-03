@@ -1,5 +1,5 @@
 🚀 Major upgrade 🚀 : Migration to  **Pytorch v1** and **Python 3.7**. The code is now much more generic and easy to install. 
-
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/3d-coded-3d-correspondences-by-deep-1/3d-point-cloud-matching-on-faust)](https://paperswithcode.com/sota/3d-point-cloud-matching-on-faust?p=3d-coded-3d-correspondences-by-deep-1)
 # 3D-CODED : 3D Correspondences by Deep Deformation :page_with_curl:
 
 This repository contains the source codes for the paper [3D-CODED : 3D Correspondences by Deep Deformation](http://imagine.enpc.fr/~groueixt/3D-CODED/index.html). The task is to put 2 meshes in point-wise correspondence. Below, given 2 humans scans with holes, the reconstruction are in correspondence (suggested by color).
