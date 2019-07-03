@@ -86,7 +86,7 @@ You need to make sure your meshes are preprocessed correctly :
 
 
 * The trunk axis is the **Y axis** (visualize your mesh against the mesh in ```data``` to make sure they are normalized in the same way). 
-* the **scale** should be about 1.7 for a standing human (meaning the unit for the point cloud is the ```cm```). You can automatically scale them with the flag ```--scale 1```
+* the **scale** should be about 1.7 for a standing human (meaning the unit for the point cloud is the ```m```). You can automatically scale them with the flag ```--scale 1```
 
 
 #### Options  
