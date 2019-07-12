@@ -16,7 +16,7 @@ def unwrap_self(arg, **kwarg):
     return arg[0]._getitem(*(arg[1:]), **kwarg)
 
 class SURREAL(data.Dataset):
-    def __init__(self, train,  npoints=2500, regular_sampling = False, normal=False, data_augmentation_Z_rotation=False, data_augmentation_Z_rotation_range=360, data_augmentation_3D_rotation=False, cache=False):
+    def __init__(self, train,  npoints=2500, regular_sampling = False, normal=False, data_augmentation_Z_rotation=False, data_augmentation_Z_rotation_range=360, data_augmentation_3D_rotation=False, cache=True):
 
         self.cache = cache
         self.data_augmentation_Z_rotation = data_augmentation_Z_rotation
