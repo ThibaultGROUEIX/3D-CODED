@@ -1,41 +1,19 @@
-🚀 Major upgrade 🚀 : Migration to  **Pytorch v1** and **Python 3.7**. The code is now much more generic and easy to install. 
+🚀 Last upgrade 🚀 : Release of data + dataloaders
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/3d-coded-3d-correspondences-by-deep-1/3d-point-cloud-matching-on-faust)](https://paperswithcode.com/sota/3d-point-cloud-matching-on-faust?p=3d-coded-3d-correspondences-by-deep-1)
+
 # 3D-CODED : 3D Correspondences by Deep Deformation :page_with_curl:
 
 This repository contains the source codes for the paper [3D-CODED : 3D Correspondences by Deep Deformation](http://imagine.enpc.fr/~groueixt/3D-CODED/index.html). The task is to put 2 meshes in point-wise correspondence. Below, given 2 humans scans with holes, the reconstruction are in correspondence (suggested by color).
 
-<img src="README/mesh25.ply.gif" style="zoom:80%" /><img src="README/25RecBestRotReg.ply.gif" style="zoom:80%" />
+<img src="README/mesh25.ply.gif" style="zoom:60%" /><img src="README/25RecBestRotReg.ply.gif" style="zoom:60%" /><img src="README/mesh8.ply.gif" style="zoom:60%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:60%" />
 
-
-<img src="README/mesh8.ply.gif" style="zoom:80%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:80%" />
-
-
-## Citing this work 
-
-If you find this work useful in your research, please consider citing:
-
-```
-@inproceedings{groueix2018b,
-          title = {3D-CODED : 3D Correspondences by Deep Deformation},
-          author={Groueix, Thibault and Fisher, Matthew and Kim, Vladimir G. and Russell, Bryan and Aubry, Mathieu},
-          booktitle = {ECCV},
-          year = 2018}
-        }
-```
-
-## Project Page 
-
-The project page is available [http://imagine.enpc.fr/~groueixt/3D-CODED/](http://imagine.enpc.fr/~groueixt/3D-CODED/index.html)
-
-## Install :construction_worker:
-
-This implementation uses [Pytorch](http://pytorch.org/). 
+# Easy Install :construction_worker:
 
 ```shell
 git clone git@github.com:ThibaultGROUEIX/3D-CODED.git ## Download the repo
 conda create --name pytorch-atlasnet python=3.7 ## Create python env
 source activate pytorch-atlasnet
-pip install pandas visdom trimesh sklearn
+pip install pandas visdom trimesh sklearn shapely
 conda install pytorch torchvision -c pytorch # or from sources if you prefer
 # you're done ! Congrats :)
 ```
@@ -50,7 +28,7 @@ cd 3D-CODED/extension
 python setup.py install
 ```
 
-## Using the Trained models :train2:
+# Using the Trained models :train2:
 
 The trained models and some corresponding results are also available online :
 
@@ -119,33 +97,23 @@ You need to make sure your meshes are preprocessed correctly :
 
 * If you want to use ```inference/correspondences.py``` to process a hole dataset, like FAUST test set, make sure you don't load the same network in memory every time you compute correspondences between two meshes (which will happen with the naive and simplest way of doing it by calling ```inference/correspondences.py``` iteratively on all the pairs). A example of bad practice is in ```./auxiliary/script.sh```, for the FAUST inter challenge. **Good luck :-)**
 
-## Training the autoencoder
-
-#### Data  
-
-The dataset can't be shared because of copyrights issues. Since the generation process of the dataset is quite heavy, it has it's own README in ```data/README.md```. Brace yourselve :-)
 
 
-#### Install Pymesh
+# Train the models 
 
-Follow the specific repo instruction [here](https://github.com/qnzhou/PyMesh).
+#### Data: the easy way
 
-Pymesh is my favorite Geometry Processing Library for Python, it's developed by an Adobe researcher : [Qingnan Zhou](https://research.adobe.com/person/qingnan-zhou/). It can be tricky to set up. Trimesh is good alternative but requires a few code edits in this case.
-
-#### Options
-
-```python
-'--batchSize', type=int, default=32, help='input batch size'
-'--workers', type=int, help='number of data loading workers', default=8
-'--nepoch', type=int, default=75, help='number of epochs to train for'
-'--model', type=str, default='', help='optional reload model path'
-'--env', type=str, default="unsup-symcorrect-ratio", help='visdom environment'
-'--laplace', type=int, default=0, help='regularize towords 0 curvature, or template curvature'
+```shell
+cd data; ./download_data.sh; cd .. # download the data
 ```
 
+### Data: the hard way
 
+The hard way is generating your own synthetic dataset of humans.
 
-#### Now you can start training
+Since the generation process of the dataset is quite heavy, it has it's own README in ```data/README.md```. Brace yourselve :-)
+
+#### Start training
 
 * First launch a visdom server :
 
@@ -156,10 +124,7 @@ python -m visdom.server -p 8888
 * Launch the training. Check out all the options in ```./training/train_sup.py``` .
 
 ```shell
-export CUDA_VISIBLE_DEVICES=0 #whichever you want
-source activate pytorch-atlasnet
-git pull
-env=3D-CODED
+source activate pytorch-atlasnet; env=3D-CODED
 python ./training/train_sup.py --env $env  |& tee ${env}.txt
 ```
 
@@ -175,6 +140,17 @@ python ./training/train_sup.py --env $env  |& tee ${env}.txt
 | train_unsup.py | 4.883                       | TODO       | TODO             |
 
 ⁽²⁾this is only an estimate, the code is not optimised
+
+#### Options
+
+```python
+'--batchSize', type=int, default=32, help='input batch size'
+'--workers', type=int, help='number of data loading workers', default=8
+'--nepoch', type=int, default=75, help='number of epochs to train for'
+'--model', type=str, default='', help='optional reload model path'
+'--env', type=str, default="unsup-symcorrect-ratio", help='visdom environment'
+'--laplace', type=int, default=0, help='regularize towords 0 curvature, or template curvature'
+```
 
 
 
@@ -192,11 +168,22 @@ python ./training/train_sup.py --env $env  |& tee ${env}.txt
 * This work was funded by [Ecole Doctorale MSTIC](http://www.univ-paris-est.fr/fr/-ecole-doctorale-mathematiques-et-stic-mstic-ed-532/). Thanks !
 * And last but not least, my great co-authors :  **[Matthew Fisher](http://graphics.stanford.edu/~mdfisher/publications.html), [Vladimir G. Kim](http://vovakim.com/), [Bryan C. Russell](http://bryanrussell.org/), and [Mathieu Aubry](http://imagine.enpc.fr/~aubrym/cv.html)**
 
-## License
-
-[MIT](https://github.com/ThibaultGROUEIX/AtlasNet/blob/master/license_MIT)
 
 
+## Citing this work 
+
+If you find this work useful in your research, please consider citing:
+
+```
+@inproceedings{groueix2018b,
+          title = {3D-CODED : 3D Correspondences by Deep Deformation},
+          author={Groueix, Thibault and Fisher, Matthew and Kim, Vladimir G. and Russell, Bryan and Aubry, Mathieu},
+          booktitle = {ECCV},
+          year = 2018}
+        }
+```
+
+# 
 
 ## Cool Contributions
 
@@ -205,3 +192,9 @@ python ./training/train_sup.py --env $env  |& tee ${env}.txt
 ![visdom](./README/image.png)
 
 [![Analytics](https://ga-beacon.appspot.com/UA-91308638-2/github.com/ThibaultGROUEIX/3D-CODED/readme.md?pixel)](https://github.com/ThibaultGROUEIX/3D-CODED/)
+
+## License
+
+[MIT](https://github.com/ThibaultGROUEIX/AtlasNet/blob/master/license_MIT)
+
+## 

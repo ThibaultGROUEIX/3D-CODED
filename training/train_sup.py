@@ -6,7 +6,7 @@ import torch
 import torch.optim as optim
 import sys
 sys.path.append('./auxiliary/')
-from datasetSMPL2 import *
+from dataset_surreal import *
 from model import *
 from utils import *
 from ply import *
@@ -49,22 +49,22 @@ opt.manualSeed = random.randint(1, 10000)  # fix seed
 print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
-L2curve_train_smpl = []
+L2curve_train_SURREAL = []
 L2curve_val_smlp = []
 
 # meters to record stats on learning
-train_loss_L2_smpl = AverageValueMeter()
-val_loss_L2_smpl = AverageValueMeter()
+train_loss_L2_SURREAL = AverageValueMeter()
+val_loss_L2_SURREAL = AverageValueMeter()
 tmp_val_loss = AverageValueMeter()
 # ========================================================== #
 
 
 # ===================CREATE DATASET================================= #
-dataset = SMPL(train=True, regular = True)
+dataset = SURREAL(train=True, regular = True)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
                                          shuffle=True, num_workers=int(opt.workers))
-dataset_smpl_test = SMPL(train=False)
-dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,
+dataset_SURREAL_test = SURREAL(train=False)
+dataloader_SURREAL_test = torch.utils.data.DataLoader(dataset_SURREAL_test, batch_size=opt.batchSize,
                                          shuffle=False, num_workers=int(opt.workers))
 len_dataset = len(dataset)
 # ========================================================== #
@@ -96,18 +96,18 @@ for epoch in range(opt.nepoch):
         optimizer = optim.Adam(network.parameters(), lr=lrate)
 
     # TRAIN MODE
-    train_loss_L2_smpl.reset()
+    train_loss_L2_SURREAL.reset()
     network.train()
     for i, data in enumerate(dataloader, 0):
         optimizer.zero_grad()
-        points, idx,_ = data
+        points, idx,_,_ = data
         points = points.transpose(2, 1).contiguous()
         points = points.cuda()
         pointsReconstructed = network.forward_idx(points, idx)  # forward pass
         loss_net = torch.mean(
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
         loss_net.backward()
-        train_loss_L2_smpl.update(loss_net.item())
+        train_loss_L2_SURREAL.update(loss_net.item())
         optimizer.step()  # gradient update
 
         # VIZUALIZE
@@ -131,17 +131,17 @@ for epoch in range(opt.nepoch):
 
     # Validation
     with torch.no_grad():
-        #val on SMPL data
+        #val on SURREAL data
         network.eval()
-        val_loss_L2_smpl.reset()
-        for i, data in enumerate(dataloader_smpl_test, 0):
-            points, fn, idx = data
+        val_loss_L2_SURREAL.reset()
+        for i, data in enumerate(dataloader_SURREAL_test, 0):
+            points, fn,_,  idx = data
             points = points.transpose(2, 1).contiguous()
             points = points.cuda()
             pointsReconstructed = network(points)  # forward pass
             loss_net = torch.mean(
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
-            val_loss_L2_smpl.update(loss_net.item())
+            val_loss_L2_SURREAL.update(loss_net.item())
             # VIZUALIZE
             if i % 10 == 0:
                 vis.scatter(X=points.transpose(2, 1).contiguous()[0].data.cpu(),
@@ -162,23 +162,23 @@ for epoch in range(opt.nepoch):
       
 
         # UPDATE CURVES
-        L2curve_train_smpl.append(train_loss_L2_smpl.avg)
-        L2curve_val_smlp.append(val_loss_L2_smpl.avg)
+        L2curve_train_SURREAL.append(train_loss_L2_SURREAL.avg)
+        L2curve_val_smlp.append(val_loss_L2_SURREAL.avg)
 
-        vis.line(X=np.column_stack((np.arange(len(L2curve_train_smpl)), np.arange(len(L2curve_val_smlp)))),
-                 Y=np.column_stack((np.array(L2curve_train_smpl), np.array(L2curve_val_smlp))),
+        vis.line(X=np.column_stack((np.arange(len(L2curve_train_SURREAL)), np.arange(len(L2curve_val_smlp)))),
+                 Y=np.column_stack((np.array(L2curve_train_SURREAL), np.array(L2curve_val_smlp))),
                  win='loss',
-                 opts=dict(title="loss", legend=["L2curve_train_smpl" + opt.env,"L2curve_val_smlp" + opt.env,]))
+                 opts=dict(title="loss", legend=["L2curve_train_SURREAL" + opt.env,"L2curve_val_smlp" + opt.env,]))
 
-        vis.line(X=np.column_stack((np.arange(len(L2curve_train_smpl)), np.arange(len(L2curve_val_smlp)))),
-                 Y=np.log(np.column_stack((np.array(L2curve_train_smpl), np.array(L2curve_val_smlp)))),
+        vis.line(X=np.column_stack((np.arange(len(L2curve_train_SURREAL)), np.arange(len(L2curve_val_smlp)))),
+                 Y=np.log(np.column_stack((np.array(L2curve_train_SURREAL), np.array(L2curve_val_smlp)))),
                  win='log',
-                 opts=dict(title="log", legend=["L2curve_train_smpl" + opt.env,"L2curve_val_smlp" + opt.env,]))
+                 opts=dict(title="log", legend=["L2curve_train_SURREAL" + opt.env,"L2curve_val_smlp" + opt.env,]))
 
         # dump stats in log file
         log_table = {
-            "val_loss_L2_smpl": val_loss_L2_smpl.avg,
-            "train_loss_L2_smpl": train_loss_L2_smpl.avg,
+            "val_loss_L2_SURREAL": val_loss_L2_SURREAL.avg,
+            "train_loss_L2_SURREAL": train_loss_L2_SURREAL.avg,
             "epoch": epoch,
             "lr": lrate,
             "env": opt.env,
