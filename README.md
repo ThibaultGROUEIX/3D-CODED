@@ -5,7 +5,8 @@
 
 This repository contains the source codes for the paper [3D-CODED : 3D Correspondences by Deep Deformation](http://imagine.enpc.fr/~groueixt/3D-CODED/index.html). The task is to put 2 meshes in point-wise correspondence. Below, given 2 humans scans with holes, the reconstruction are in correspondence (suggested by color).
 
-<img src="README/mesh25.ply.gif" style="zoom:60%" /><img src="README/25RecBestRotReg.ply.gif" style="zoom:60%" /><img src="README/mesh8.ply.gif" style="zoom:60%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:60%" />
+<img src="README/mesh25.ply.gif" style="zoom:60%" /><img src="README/25RecBestRotReg.ply.gif" style="zoom:60%" />
+<img src="README/mesh8.ply.gif" style="zoom:60%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:60%" />
 
 # Easy Install :construction_worker:
 
