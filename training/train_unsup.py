@@ -65,7 +65,7 @@ tmp_val_loss = AverageValueMeter()
 
 
 # ===================CREATE DATASET================================= #
-dataset = SURREAL(train=True, regular = True)
+dataset = SURREAL(train=True, regular_sampling = True)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
                                          shuffle=True, num_workers=int(opt.workers), drop_last=True)
 dataset_SURREAL_test = SURREAL(train=False)
