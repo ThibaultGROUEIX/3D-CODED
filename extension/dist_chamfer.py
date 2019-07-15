@@ -5,10 +5,7 @@ import torch
 import sys
 from numbers import Number
 from collections import Set, Mapping, deque
-print("zboub_from_dist_cham")
-
 import chamfer
-print("zboub_from_dist_cham")
 
 
 # Chamfer's distance module @thibaultgroueix
