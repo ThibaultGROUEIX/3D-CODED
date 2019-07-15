@@ -1,6 +1,7 @@
 import torch
 import dist_chamfer as ext
 distChamfer =  ext.chamferDist()
+from torch.autograd import Variable
 
 def pairwise_dist(x, y):
     xx, yy, zz = torch.mm(x,x.t()), torch.mm(y,y.t()), torch.mm(x, y.t())
@@ -33,10 +34,12 @@ def test_chamfer():
 
 	distChamfer =  ext.chamferDist()
 	print("zboub")
-	a = torch.rand(4,100,3).cuda()
-	b = torch.rand(4,100,3).cuda()
+	p1 = torch.rand(4,100,3).cuda()
+	p2 = torch.rand(4,100,3).cuda()
+	points1 = Variable(p1,requires_grad = True)
+	points2 = Variable(p2)
 	print("zboub")
-	dist1, dist2, = distChamfer(a,b)
+	dist1, dist2, = distChamfer(points1,points2)
 	print("zboub passed")
 
 	loss = torch.sum(dist1)
@@ -44,7 +47,7 @@ def test_chamfer():
 	loss.backward()
 	print(points1.grad, points2.grad)
 
-	mydist1, mydist2 = mydistChamfer(a,b)
+	mydist1, mydist2 = mydistChamfer(points1,points2)
 
 	assert torch.all(torch.eq(dist1, mydist1)) and torch.all(torch.eq(dist2, mydist2)) , "chamfer cuda and chamfer normal are not giving the same results"
 
