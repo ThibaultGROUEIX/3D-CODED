@@ -15,7 +15,7 @@ import json
 import datetime
 import visdom
 from LaplacianLoss import *
-import thread
+import _thread as thread
 thread.start_new_thread(os.system, ('visdom -p 8888 > /dev/null 2>&1',))
 
 # =============PARAMETERS======================================== #
