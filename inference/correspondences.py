@@ -19,7 +19,8 @@ import visdom
 import global_variables
 import trimesh
 import os
-os.system('visdom -p 8888 > /dev/null 2>&1')
+import thread
+thread.start_new_thread(os.system, ('visdom -p 8888 > /dev/null 2>&1',))
 
 def compute_correspondances(source_p, source_reconstructed_p, target_p, target_reconstructed_p):
     """
