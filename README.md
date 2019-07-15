@@ -9,7 +9,7 @@ This repository contains the source codes for the paper [3D-CODED : 3D Correspon
 
 <img src="README/mesh8.ply.gif" style="zoom:60%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:60%" />
 
-# 6-lines Easy Install :construction_worker:
+# 6-lines Easy Install ​a​n​d ​q​uic​k​ ​t​e​s​t​s:construction_worker:
 
 ```shell
 ## Download the repo
@@ -22,15 +22,12 @@ conda install pytorch torchvision -c pytorch
 cd 3D-CODED/extension
 python setup.py install
 # you're done ! Congrats :)
+#Tested on 11/18 with  pytorch 0.4.1 (py37_py36_py35_py27__9.0.176_7.1.2_2) and [latest source]
 ```
 
-Tested on 11/18 with  pytorch 0.4.1 (py37_py36_py35_py27__9.0.176_7.1.2_2) and [latest source](
+## Quick Test  ```python  inference/correspondences.py```
 
-
-
-#### Quick Test  ```python  inference/correspondences.py```
-
-#### Quick Train  ```python ./training/train_sup.py```
+## Quick Train  ```python ./training/train_sup.py```
 
 Below are more details.
 

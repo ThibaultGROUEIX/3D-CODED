@@ -230,21 +230,21 @@ for epoch in range(opt.nepoch):
             # VIZUALIZE
             if i % 10 == 0:
                 vis.scatter(X=points.transpose(2, 1).contiguous()[0].data.cpu(),
-                            win='Test_smlp_input',
+                            win='Test_SURREAL_input',
                             opts=dict(
-                                title="Test_smlp_input",
+                                title="Test_SURREAL_input",
                                 markersize=2,
                             ),
                             )
                 vis.scatter(X=pointsReconstructed[0].data.cpu(),
-                            win='Test_smlp_output',
+                            win='Test_SURREAL_output',
                             opts=dict(
-                                title="Test_smlp_output",
+                                title="Test_SURREAL_output",
                                 markersize=2,
                             ),
                             )
 
-            print('[%d: %d/%d] test smlp loss:  %f' % (epoch, i, len_dataset / 32, loss_net.item()))
+            print('[%d: %d/%d] test SURREAL loss:  %f' % (epoch, i, len_dataset / 32, loss_net.item()))
       
         L2curve_train_SURREAL.append(train_loss_L2_SURREAL.avg)
         L2curve_val_SURREAL.append(val_loss_L2_SURREAL.avg)

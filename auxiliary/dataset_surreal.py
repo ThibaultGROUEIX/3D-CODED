@@ -28,6 +28,7 @@ class SURREAL(data.Dataset):
         self.npoints = npoints
 
         # PATH  : YOU MAY NEED TO EDIT THOSE IF YOU GENERATE YOUR OWN SYNTHETIC MODELS
+        # Not used when flag "cache" is True
         if self.train:
             self.path = "./data/dataset-surreal/"
             self.path_2 = "./data/dataset-bent/"
@@ -94,7 +95,6 @@ class SURREAL(data.Dataset):
 
         points = input.vertices
         points, _, _ = pointcloud_processor.center_bounding_box(points)
-        # TODO : Add bounding box normalization !
 
         return torch.from_numpy(points.astype(np.float32)).contiguous().unsqueeze(0)
     

@@ -59,7 +59,7 @@ print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
 L2curve_train_SURREAL = []
-L2curve_val_smlp = []
+L2curve_val_SURREAL = []
 
 # meters to record stats on learning
 train_loss_L2_SURREAL = AverageValueMeter()
@@ -154,35 +154,35 @@ for epoch in range(opt.nepoch):
             # VIZUALIZE
             if i % 10 == 0:
                 vis.scatter(X=points.transpose(2, 1).contiguous()[0].data.cpu(),
-                            win='Test_smlp_input',
+                            win='Test_SURREAL_input',
                             opts=dict(
-                                title="Test_smlp_input",
+                                title="Test_SURREAL_input",
                                 markersize=2,
                             ),
                             )
                 vis.scatter(X=pointsReconstructed[0].data.cpu(),
-                            win='Test_smlp_output',
+                            win='Test_SURREAL_output',
                             opts=dict(
-                                title="Test_smlp_output",
+                                title="Test_SURREAL_output",
                                 markersize=2,
                             ),
                             )
-            print('[%d: %d/%d] test smlp loss:  %f' % (epoch, i, len_dataset / 32, loss_net.item()))
+            print('[%d: %d/%d] test SURREAL loss:  %f' % (epoch, i, len_dataset / 32, loss_net.item()))
       
 
         # UPDATE CURVES
         L2curve_train_SURREAL.append(train_loss_L2_SURREAL.avg)
-        L2curve_val_smlp.append(val_loss_L2_SURREAL.avg)
+        L2curve_val_SURREAL.append(val_loss_L2_SURREAL.avg)
 
-        vis.line(X=np.column_stack((np.arange(len(L2curve_train_SURREAL)), np.arange(len(L2curve_val_smlp)))),
-                 Y=np.column_stack((np.array(L2curve_train_SURREAL), np.array(L2curve_val_smlp))),
+        vis.line(X=np.column_stack((np.arange(len(L2curve_train_SURREAL)), np.arange(len(L2curve_val_SURREAL)))),
+                 Y=np.column_stack((np.array(L2curve_train_SURREAL), np.array(L2curve_val_SURREAL))),
                  win='loss',
-                 opts=dict(title="loss", legend=["L2curve_train_SURREAL" + opt.env,"L2curve_val_smlp" + opt.env,]))
+                 opts=dict(title="loss", legend=["L2curve_train_SURREAL" + opt.env,"L2curve_val_SURREAL" + opt.env,]))
 
-        vis.line(X=np.column_stack((np.arange(len(L2curve_train_SURREAL)), np.arange(len(L2curve_val_smlp)))),
-                 Y=np.log(np.column_stack((np.array(L2curve_train_SURREAL), np.array(L2curve_val_smlp)))),
+        vis.line(X=np.column_stack((np.arange(len(L2curve_train_SURREAL)), np.arange(len(L2curve_val_SURREAL)))),
+                 Y=np.log(np.column_stack((np.array(L2curve_train_SURREAL), np.array(L2curve_val_SURREAL)))),
                  win='log',
-                 opts=dict(title="log", legend=["L2curve_train_SURREAL" + opt.env,"L2curve_val_smlp" + opt.env,]))
+                 opts=dict(title="log", legend=["L2curve_train_SURREAL" + opt.env,"L2curve_val_SURREAL" + opt.env,]))
 
         # dump stats in log file
         log_table = {
