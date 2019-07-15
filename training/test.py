@@ -67,7 +67,7 @@ if opt.model != '':
 
 # =============start of the learning loop ======================================== #
 
-def test():
+def test_trained_nets():
     with torch.no_grad():
         #val on SURREAL data
         network.eval()
@@ -84,4 +84,4 @@ def test():
         print("test loss: ", val_loss_L2_SURREAL.avg)       
     assert(val_loss_L2_SURREAL.avg < 0.0002)
 
-test()
+test_trained_nets()
