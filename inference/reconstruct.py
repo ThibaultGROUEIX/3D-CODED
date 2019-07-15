@@ -5,7 +5,7 @@ import sys
 sys.path.append('./auxiliary/')
 from model import *
 from utils import *
-import ply
+import myply as ply
 import sys
 import torch.optim as optim
 sys.path.append("./extension/")
