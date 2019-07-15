@@ -36,9 +36,8 @@ def test_chamfer():
 	a = torch.rand(4,100,3).cuda()
 	b = torch.rand(4,100,3).cuda()
 	print("zboub")
-
 	dist1, dist2, idx1, idx2 = distChamfer(a,b)
-	print("zboub")
+	print("zboub passed")
 
 	loss = torch.sum(dist1)
 	print(loss)
