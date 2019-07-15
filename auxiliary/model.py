@@ -54,9 +54,9 @@ class PointNetfeat(nn.Module):
         self.bn3 = torch.nn.BatchNorm1d(1024)
         self.trans = trans
 
-
         self.num_points = num_points
         self.global_feat = global_feat
+
     def forward(self, x):
         batchsize = x.size()[0]
         if self.trans:
@@ -78,6 +78,7 @@ class PointNetfeat(nn.Module):
                 return torch.cat([x, pointfeat], 1), trans
         else:
             return x
+
 
 class PointGenCon(nn.Module):
     def __init__(self, bottleneck_size = 2500):
@@ -101,6 +102,7 @@ class PointGenCon(nn.Module):
         x = F.relu(self.bn3(self.conv3(x)))
         x = 2*self.th(self.conv4(x))
         return x
+
 
 class AE_AtlasNet_Humans(nn.Module):
     def __init__(self, num_points = 6890, bottleneck_size = 1024, nb_primitives = 1):
@@ -188,7 +190,7 @@ class AE_AtlasNet_Humans(nn.Module):
         outs.append(self.decoder[0](y))
         torch.cuda.synchronize()
         return torch.cat(outs,2).contiguous().transpose(2,1).contiguous()
-
+        
 
     def forward_idx(self, x, idx):
         x = self.encoder(x)

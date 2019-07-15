@@ -9,26 +9,30 @@ This repository contains the source codes for the paper [3D-CODED : 3D Correspon
 
 <img src="README/mesh8.ply.gif" style="zoom:60%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:60%" />
 
-# Easy Install :construction_worker:
+# 6-lines Easy Install :construction_worker:
 
 ```shell
-git clone git@github.com:ThibaultGROUEIX/3D-CODED.git ## Download the repo
-conda create --name pytorch-atlasnet python=3.7 ## Create python env
-source activate pytorch-atlasnet
+## Download the repo
+git clone git@github.com:ThibaultGROUEIX/3D-CODED.git
+## Create python env
+conda create --name pytorch-atlasnet python=3.7; source activate pytorch-atlasnet
 pip install pandas visdom trimesh sklearn shapely
-conda install pytorch torchvision -c pytorch # or from sources if you prefer
+conda install pytorch torchvision -c pytorch 
+# Build chamfer distance 
+cd 3D-CODED/extension
+python setup.py install
 # you're done ! Congrats :)
 ```
 
 Tested on 11/18 with  pytorch 0.4.1 (py37_py36_py35_py27__9.0.176_7.1.2_2) and [latest source](
 
-#### Build chamfer distance 
 
-```shell
-source activate pytorch-atlasnet
-cd 3D-CODED/extension
-python setup.py install
-```
+
+#### Quick Test  ```python  inference/correspondences.py```
+
+#### Quick Train  ```python ./training/train_sup.py```
+
+Below are more details.
 
 # Using the Trained models :train2:
 
@@ -138,8 +142,8 @@ python ./training/train_sup.py --env $env  |& tee ${env}.txt
 
 | Method         | Faust euclidean error in cm | GPU memory | Time by epoch⁽²⁾ |
 | -------------- | --------------------------- | ---------- | ---------------- |
-| train_sup.py   | 2.878                       | TODO       | TODO             |
-| train_unsup.py | 4.883                       | TODO       | TODO             |
+| train_sup.py   | 2.878                       | 8 GB       | 25min            |
+| train_unsup.py | 4.883                       | 8.4 GB     | 120min           |
 
 ⁽²⁾this is only an estimate, the code is not optimised
 

@@ -86,6 +86,7 @@ if __name__ == '__main__':
     global_variables.network.cuda()
     global_variables.network.apply(weights_init)
     if opt.model != '':
+        print("using model: ", opt.model)
         global_variables.network.load_state_dict(torch.load(opt.model))
     global_variables.network.eval()
 
