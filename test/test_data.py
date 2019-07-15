@@ -1,3 +1,4 @@
+import sys
 sys.path.append('./auxiliary/')
 
 from dataset_surreal import *
