@@ -45,8 +45,7 @@ def test_chamfer():
 	mydist1, mydist2 = mydistChamfer(points1,points2)
 	d1 = (dist1 - mydist1)**2
 	d2 = (dist2 - mydist2)**2
-	print(d1)
-	print(d2)
-	assert torch.all(torch.eq(dist1, mydist1)) and torch.all(torch.eq(dist2, mydist2)) , "chamfer cuda and chamfer normal are not giving the same results"
+
+	assert torch.sum(d1) + torch.sum(d1) < 0.00000001  , "chamfer cuda and chamfer normal are not giving the same results"
 
 test_chamfer()
