@@ -57,7 +57,6 @@ dataloader_SURREAL_test = torch.utils.data.DataLoader(dataset_SURREAL_test, batc
 # ===================CREATE network================================= #
 network = AE_AtlasNet_Humans()
 network.cuda()  # put network on GPU
-network.apply(weights_init)  # initialization of the weight
 if opt.model != '':
     network.load_state_dict(torch.load(opt.model))
     print(" Previous weight loaded ")
