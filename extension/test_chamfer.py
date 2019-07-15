@@ -27,7 +27,7 @@ def mydistChamfer(a,b):
     rx = xx[:, diag_ind, diag_ind].unsqueeze(1).expand_as(xx)
     ry = yy[:, diag_ind, diag_ind].unsqueeze(1).expand_as(yy)
     P = (rx.transpose(2,1) + ry - 2*zz)
-    return P.min(1)[0], P.min(2)[0]
+    return  P.min(2)[0], P.min(1)[0]
 
 def test_chamfer():
 	distChamfer =  ext.chamferDist()
@@ -43,10 +43,6 @@ def test_chamfer():
 	print(points1.grad, points2.grad)
 
 	mydist1, mydist2 = mydistChamfer(points1,points2)
-	print(dist1)
-	print(dist2)
-	print(mydist1)
-	print(mydist2)
 	assert torch.all(torch.eq(dist1, mydist1)) and torch.all(torch.eq(dist2, mydist2)) , "chamfer cuda and chamfer normal are not giving the same results"
 
 test_chamfer()
