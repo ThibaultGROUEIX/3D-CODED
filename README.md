@@ -9,18 +9,15 @@ This repository contains the source codes for the paper [3D-CODED : 3D Correspon
 
 <img src="README/mesh8.ply.gif" style="zoom:60%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:60%" />
 
-# 6-lines Easy Install ​a​n​d ​q​uic​k​ ​t​e​s​t​s:construction_worker:
+# 3-lines Easy Install ​a​n​d ​q​uic​k​ ​t​e​s​t​s:construction_worker:
 
 ```shell
 ## Download the repo
 git clone git@github.com:ThibaultGROUEIX/3D-CODED.git
-## Create python env
-conda create --name pytorch-atlasnet python=3.7; source activate pytorch-atlasnet
-pip install pandas visdom trimesh sklearn shapely pytest
-conda install pytorch torchvision -c pytorch 
+## Pip dependencies - python 3.7
+pip install pandas visdom trimesh sklearn shapely pytest torch torchvision joblib
 # Build chamfer distance 
-cd 3D-CODED/extension
-python setup.py install
+cd 3D-CODED/extension; python setup.py install
 # you're done ! Congrats :)
 #Tested on 11/18 with  pytorch 0.4.1 (py37_py36_py35_py27__9.0.176_7.1.2_2) and [latest source]
 ```
