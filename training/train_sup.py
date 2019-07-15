@@ -14,6 +14,7 @@ import os
 import json
 import datetime
 import visdom
+os.system('visdom -p 8888 > /dev/null 2>&1')
 
 # =============PARAMETERS======================================== #
 parser = argparse.ArgumentParser()

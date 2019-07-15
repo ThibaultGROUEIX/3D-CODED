@@ -15,6 +15,7 @@ import json
 import datetime
 import visdom
 from LaplacianLoss import *
+os.system('visdom -p 8888 > /dev/null 2>&1')
 
 # =============PARAMETERS======================================== #
 lambda_laplace = 0.005
