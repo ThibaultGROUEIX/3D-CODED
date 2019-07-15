@@ -4,7 +4,7 @@ global network
 global opt
 global mesh_ref
 global mesh_ref_LR
-
+import os
 # =============Get data and template======================================== #
 if not os.path.exists("./data/template/template.ply"):
     os.system('./data/download_template.sh')
