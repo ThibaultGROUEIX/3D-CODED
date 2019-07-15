@@ -29,6 +29,8 @@ def mydistChamfer(a,b):
     return P.min(1)[0], P.min(2)[0]
 
 def test_chamfer():
+	print("zboub")
+
 	distChamfer =  ext.chamferDist()
 	print("zboub")
 	a = torch.rand(4,100,3).cuda()
