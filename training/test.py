@@ -79,11 +79,7 @@ with torch.no_grad():
         pointsReconstructed = network(points)  # forward pass
         loss_net = torch.mean(
             (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
-        val_loss_L2_SURREAL.update(loss_net.item())
-        # VIZUALIZE
-        print('[%d: %d/%d] test SURREAL loss:  %f' % (epoch, i, len_dataset / 32, loss_net.item()))
-  
+        val_loss_L2_SURREAL.update(loss_net.item())  
 
-
-    print("test loss: ", val_loss_L2_SURREAL.avg)        # UPDATE CURVES
+    print("test loss: ", val_loss_L2_SURREAL.avg)       
         
