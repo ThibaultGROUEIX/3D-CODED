@@ -29,10 +29,8 @@ class chamferFunction(Function):
         dist2 = dist2.cuda()
         idx1 = idx1.cuda()
         idx2 = idx2.cuda()
-        print("zboub_from_forward")
 
         chamfer.forward(xyz1, xyz2, dist1, dist2, idx1, idx2)
-        print("zboub_from_forward")
 
         ctx.save_for_backward(xyz1, xyz2, idx1, idx2)
         return dist1, dist2

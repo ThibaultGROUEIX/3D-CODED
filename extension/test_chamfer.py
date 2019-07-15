@@ -30,17 +30,12 @@ def mydistChamfer(a,b):
     return P.min(1)[0], P.min(2)[0]
 
 def test_chamfer():
-	print("zboub")
-
 	distChamfer =  ext.chamferDist()
-	print("zboub")
 	p1 = torch.rand(4,100,3).cuda()
 	p2 = torch.rand(4,100,3).cuda()
 	points1 = Variable(p1,requires_grad = True)
 	points2 = Variable(p2)
-	print("zboub")
 	dist1, dist2, = distChamfer(points1,points2)
-	print("zboub passed")
 
 	loss = torch.sum(dist1)
 	print(loss)
@@ -48,7 +43,8 @@ def test_chamfer():
 	print(points1.grad, points2.grad)
 
 	mydist1, mydist2 = mydistChamfer(points1,points2)
-
+	print(dist1)
+	print(mydist1)
 	assert torch.all(torch.eq(dist1, mydist1)) and torch.all(torch.eq(dist2, mydist2)) , "chamfer cuda and chamfer normal are not giving the same results"
 
 test_chamfer()
