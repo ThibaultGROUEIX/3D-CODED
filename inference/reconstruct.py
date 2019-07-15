@@ -5,7 +5,7 @@ import sys
 sys.path.append('./auxiliary/')
 from model import *
 from utils import *
-from ply import *
+import ply
 import sys
 import torch.optim as optim
 sys.path.append("./extension/")
@@ -15,7 +15,6 @@ import global_variables
 import trimesh
 import pandas as pd
 val_loss = AverageValueMeter()
-
 
 
 def regress(points):
@@ -169,7 +168,8 @@ def save(mesh, mesh_color, path, red, green, blue):
         'lst4Tite': green,
         'lst5Tite': blue,
         })
-    write_ply(filename=path, points=points2write, as_text=True, text=False, faces = pd.DataFrame(b.astype(int)), color = True)    
+    ply.write_ply(filename=path, points=points2write, as_text=True, text=False, faces = pd.DataFrame(b.astype(int)), color = True)    
+
 def reconstruct(input_p):
     """
     Recontruct a 3D shape by deforming a template
