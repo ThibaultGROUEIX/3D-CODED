@@ -8,7 +8,6 @@ sys.path.append('./auxiliary/')
 # from datasetFaust import *
 from model import *
 from utils import *
-from ply import *
 import reconstruct
 import time
 from sklearn.neighbors import NearestNeighbors
