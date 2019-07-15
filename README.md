@@ -16,7 +16,7 @@ This repository contains the source codes for the paper [3D-CODED : 3D Correspon
 git clone git@github.com:ThibaultGROUEIX/3D-CODED.git
 ## Create python env
 conda create --name pytorch-atlasnet python=3.7; source activate pytorch-atlasnet
-pip install pandas visdom trimesh sklearn shapely
+pip install pandas visdom trimesh sklearn shapely pytest
 conda install pytorch torchvision -c pytorch 
 # Build chamfer distance 
 cd 3D-CODED/extension
