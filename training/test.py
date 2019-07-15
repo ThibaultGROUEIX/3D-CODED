@@ -47,6 +47,7 @@ print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
 
+val_loss_L2_SURREAL = AverageValueMeter()
 
 # ===================CREATE DATASET================================= #
 dataset_SURREAL_test = SURREAL(train=False)
