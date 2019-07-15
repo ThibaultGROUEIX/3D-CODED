@@ -7,7 +7,6 @@ source activate pytorch-sources
 export PATH_DATASET=/home/thibault/Downloads/MPI-FAUST/test/scans
 ################################################################
 
-
 python inference/correspondences.py --inputA ${PATH_DATASET}/test_scan_006.ply --inputB ${PATH_DATASET}/test_scan_021.ply  --model $1
 mv results/correspondences.txt 006_021.txt
 python inference/correspondences.py --inputA ${PATH_DATASET}/test_scan_011.ply --inputB ${PATH_DATASET}/test_scan_107.ply --model $1

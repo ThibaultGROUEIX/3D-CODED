@@ -43,7 +43,6 @@ if not os.path.exists("./data/template/template.ply"):
 
 # =============DEFINE stuff for logs ======================================== #
 opt.manualSeed = random.randint(1, 10000)  # fix seed
-print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
 
@@ -68,18 +67,22 @@ if opt.model != '':
 # ========================================================== #
 
 # =============start of the learning loop ======================================== #
-with torch.no_grad():
-    #val on SURREAL data
-    network.eval()
-    val_loss_L2_SURREAL.reset()
-    for i, data in enumerate(dataloader_SURREAL_test, 0):
-        points, fn,_,  idx = data
-        points = points.transpose(2, 1).contiguous()
-        points = points.cuda()
-        pointsReconstructed = network(points)  # forward pass
-        loss_net = torch.mean(
-            (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
-        val_loss_L2_SURREAL.update(loss_net.item())  
 
-    print("test loss: ", val_loss_L2_SURREAL.avg)       
-        
+def test():
+    with torch.no_grad():
+        #val on SURREAL data
+        network.eval()
+        val_loss_L2_SURREAL.reset()
+        for i, data in enumerate(dataloader_SURREAL_test, 0):
+            points, fn,_,  idx = data
+            points = points.transpose(2, 1).contiguous()
+            points = points.cuda()
+            pointsReconstructed = network(points)  # forward pass
+            loss_net = torch.mean(
+                (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
+            val_loss_L2_SURREAL.update(loss_net.item())  
+
+        print("test loss: ", val_loss_L2_SURREAL.avg)       
+    assert(val_loss_L2_SURREAL.avg < 0.0002)
+
+test()
