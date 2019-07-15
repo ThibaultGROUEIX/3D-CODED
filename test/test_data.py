@@ -12,4 +12,4 @@ def test_is_dataset_centered():
 		points = datas[i]
 		points, _, _ = pointcloud_processor.center_bounding_box(points)
 		points, translation , _ =    pointcloud_processor.center_bounding_box(points)
-		assert abs(translation[0]) < 0.01 and abs(translation[1]) < 0.01 and abs(translation[2]) < 0.01:
+		assert abs(translation[0]) < 0.01 and abs(translation[1]) < 0.01 and abs(translation[2]) < 0.01, "Problem in training data centering"
