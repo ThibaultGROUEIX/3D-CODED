@@ -7,7 +7,7 @@ import pointcloud_processor
 datas = torch.load("./data/datas_surreal_train.pth")
 
 
-def is_dataset_centered():
+def test_is_dataset_centered():
 	for i in range(-10,10):
 		data, _,_,_ = datas[i]
 		points, _, _ = pointcloud_processor.center_bounding_box(points)
