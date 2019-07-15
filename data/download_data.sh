@@ -1,4 +1,5 @@
 #This script download the template file from ENPC cloud
+echo "Downloading datasets... 20GB"
 wget https://cloud.enpc.fr/s/WeR6zBa6jM8PDfg/download --no-check-certificate
 mv download datas_surreal_train.pth
 

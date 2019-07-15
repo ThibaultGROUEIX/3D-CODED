@@ -81,6 +81,16 @@ if __name__ == '__main__':
 
     distChamfer =  ext.chamferDist()
 
+    # =============Get data and template======================================== #
+    if not os.path.exists("./trained_models/sup_horse_network_last.pth"):
+        os.system('./trained_models/download_models.sh')
+    if not os.path.exists("./data/template/template.ply"):
+        os.system('./data/download_template.sh')
+    # ========================================================== #
+
+
+
+
     # load network
     global_variables.network = AE_AtlasNet_Humans(num_points=opt.num_points)
     global_variables.network.cuda()

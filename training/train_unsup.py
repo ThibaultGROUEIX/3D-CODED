@@ -32,6 +32,16 @@ opt = parser.parse_args()
 print(opt)
 # ========================================================== #
 
+
+# =============Get data and template======================================== #
+if not os.path.exists("./data/datas_surreal_train.pth"):
+    os.system('./data/download_data.sh')
+if not os.path.exists("./data/template/template.ply"):
+    os.system('./data/download_template.sh')
+# ========================================================== #
+
+
+
 # =============DEFINE CHAMFER LOSS======================================== #
 sys.path.append("./extension/")
 import dist_chamfer as ext
