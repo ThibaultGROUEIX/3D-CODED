@@ -13,6 +13,7 @@ import dist_chamfer as ext
 distChamfer =  ext.chamferDist()
 import global_variables
 import trimesh
+import pandas as pd
 val_loss = AverageValueMeter()
 
 
