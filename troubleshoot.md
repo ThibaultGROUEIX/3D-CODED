@@ -14,7 +14,7 @@ Double-check two things:
   ```
 
   ```
-cat /usr/local/cuda/version.txt
+	cat /usr/local/cuda/version.txt
   ```
 
  # 2. Compiling chamfer -> ```cc1plus: error: /usr/lib/x86_64-linux-gnu/libcudnn.so.5/include: Not a directory```
