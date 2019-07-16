@@ -15,7 +15,7 @@ This repository contains the source codes for the paper [3D-CODED : 3D Correspon
 ## Download the repo
 git clone git@github.com:ThibaultGROUEIX/3D-CODED.git
 ## Pip dependencies - python 3.7
-pip install pandas visdom trimesh==2.36.25 sklearn shapely pytest torch torchvision joblib
+pip install -r requirements.txt
 # Build chamfer distance 
 cd 3D-CODED/extension; python setup.py install
 # you're done ! Congrats :)
@@ -26,7 +26,11 @@ cd 3D-CODED/extension; python setup.py install
 
 ## Quick Train  ```python ./training/train_sup.py```
 
-Below are more details.
+If you have install issues -> [Troubleshoot](./troubleshoot.md)
+
+ 
+
+Below are more details. 
 
 # Using the Trained models :train2:
 
