@@ -340,3 +340,4 @@ class AE_AtlasNet_Animal(nn.Module):
 
 
 if __name__ == '__main__':
+    print("test")
