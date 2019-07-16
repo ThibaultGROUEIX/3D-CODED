@@ -9,7 +9,6 @@ sys.path.append('./auxiliary/')
 from dataset_surreal import *
 from model import *
 from utils import *
-from ply import *
 import os
 import json
 import datetime
