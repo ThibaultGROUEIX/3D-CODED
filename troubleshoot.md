@@ -13,13 +13,11 @@ Double-check two things:
   torch.version.cuda
   ```
 
-  
-
   ```
 cat /usr/local/cuda/version.txt
   ```
 
- #2. Compiling chamfer -> ```cc1plus: error: /usr/lib/x86_64-linux-gnu/libcudnn.so.5/include: Not a directory```
+ # 2. Compiling chamfer -> ```cc1plus: error: /usr/lib/x86_64-linux-gnu/libcudnn.so.5/include: Not a directory```
 
 From @palanglois. https://github.com/ThibaultGROUEIX/3D-CODED/issues/4
 
@@ -36,7 +34,7 @@ import os`
 `if 'CUDNN_PATH' in os.environ: del os.environ['CUDNN_PATH']
 ```
 
-#3. Importing chamfer ->  
+# 3. Importing chamfer ->  
 
 ```
 >>> import chamfer`
