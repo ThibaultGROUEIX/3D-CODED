@@ -58,7 +58,6 @@ class PointNetfeat(nn.Module):
         self.global_feat = global_feat
 
     def forward(self, x):
-        batchsize = x.size()[0]
         if self.trans:
             trans = self.stn(x)
             x = x.transpose(2,1)
@@ -95,8 +94,6 @@ class PointGenCon(nn.Module):
         self.bn3 = torch.nn.BatchNorm1d(self.bottleneck_size//4)
 
     def forward(self, x):
-        batchsize = x.size()[0]
-        # print(x.size())
         x = F.relu(self.bn1(self.conv1(x)))
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
@@ -125,13 +122,13 @@ class AE_AtlasNet_Humans(nn.Module):
         point_set = mesh.vertices
 
         bbox = np.array([[np.max(point_set[:,0]), np.max(point_set[:,1]), np.max(point_set[:,2])], [np.min(point_set[:,0]), np.min(point_set[:,1]), np.min(point_set[:,2])]])
-        tranlation = (bbox[0] + bbox[1]) / 2
-        point_set = point_set - tranlation
+        translation = (bbox[0] + bbox[1]) / 2
+        point_set = point_set - translation
 
         point_set_HR = mesh_HR.vertices
         bbox = np.array([[np.max(point_set_HR[:,0]), np.max(point_set_HR[:,1]), np.max(point_set_HR[:,2])], [np.min(point_set_HR[:,0]), np.min(point_set_HR[:,1]), np.min(point_set_HR[:,2])]])
-        tranlation = (bbox[0] + bbox[1]) / 2
-        point_set_HR = point_set_HR - tranlation
+        translation = (bbox[0] + bbox[1]) / 2
+        point_set_HR = point_set_HR - translation
 
         self.vertex = torch.from_numpy(point_set).cuda().float()
         self.vertex_HR = torch.from_numpy(point_set_HR).cuda().float()
@@ -212,18 +209,17 @@ class AE_AtlasNet_Humans(nn.Module):
 
         rand_grid = self.vertex[:int(self.num_vertex/2)].view(x.size(0), int(self.num_vertex/2), 3).transpose(1,2).contiguous()
         rand_grid = Variable(rand_grid)
-        # print(grid.sizegrid())
         y = x.unsqueeze(2).expand(x.size(0),x.size(1), rand_grid.size(2)).contiguous()
         y = torch.cat( (rand_grid, y), 1).contiguous()
         outs.append(self.decoder[0](y))
         torch.cuda.synchronize()
         rand_grid = self.vertex[int(self.num_vertex/2):].view(x.size(0), self.num_vertex  - int(self.num_vertex/2), 3).transpose(1,2).contiguous()
         rand_grid = Variable(rand_grid)
-        # print(grid.sizegrid())
         y = x.unsqueeze(2).expand(x.size(0),x.size(1), rand_grid.size(2)).contiguous()
         y = torch.cat( (rand_grid, y), 1).contiguous()
         outs.append(self.decoder[0](y))
         return torch.cat(outs,2).contiguous().transpose(2,1).contiguous()
+
 
 class AE_AtlasNet_Animal(nn.Module):
     def __init__(self, num_points = 6890, bottleneck_size = 1024, nb_primitives = 1):
@@ -246,21 +242,17 @@ class AE_AtlasNet_Animal(nn.Module):
 
         point_set = mesh.vertices
         bbox = np.array([[np.max(point_set[:,0]), np.max(point_set[:,1]), np.max(point_set[:,2])], [np.min(point_set[:,0]), np.min(point_set[:,1]), np.min(point_set[:,2])]])
-        tranlation = (bbox[0] + bbox[1]) / 2
-        point_set = point_set - tranlation
+        translation = (bbox[0] + bbox[1]) / 2
+        point_set = point_set - translation
         point_set_HR = mesh_HR.vertices
         bbox = np.array([[np.max(point_set_HR[:,0]), np.max(point_set_HR[:,1]), np.max(point_set_HR[:,2])], [np.min(point_set_HR[:,0]), np.min(point_set_HR[:,1]), np.min(point_set_HR[:,2])]])
-        tranlation = (bbox[0] + bbox[1]) / 2
-        point_set_HR = point_set_HR - tranlation
-        print(np.shape(mesh.vertices))
-        print(np.shape(mesh_HR.vertices))
+        translation = (bbox[0] + bbox[1]) / 2
+        point_set_HR = point_set_HR - translation
 
         self.vertex = torch.from_numpy(point_set).cuda().float()
         self.vertex_HR = torch.from_numpy(point_set_HR).cuda().float()
         self.num_vertex = self.vertex.size(0)
         self.num_vertex_HR = self.vertex_HR.size(0)
-        print(self.num_vertex)
-        print(self.num_vertex_HR)
 
     def forward2(self, x):
         x = self.encoder(x)
@@ -348,24 +340,3 @@ class AE_AtlasNet_Animal(nn.Module):
 
 
 if __name__ == '__main__':
-    # print('testing our method...')
-    # sim_data = Variable(torch.rand(1, 3, 400, 400))
-    # model = PointNetAE_RNN_grid2mesh()
-    # model.cuda()
-    # out = model(sim_data.cuda())
-    # print(out.size())
-
-    # print('testing baseline...')
-    # sim_data = Variable(torch.rand(1, 3, 400, 400))
-    # model = PointNetAEBottleneck()
-    # model.cuda()
-    # out = model(sim_data.cuda())
-    # print(out.size())
-
-    print('testing PointSenGet...')
-    sim_data = Variable(torch.rand(1, 4, 192, 256))
-    model = Hourglass()
-    # model.cuda()
-    # out = model(sim_data.cuda())
-    out = model(sim_data)
-    print(out.size())

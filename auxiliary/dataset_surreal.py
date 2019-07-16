@@ -5,7 +5,6 @@ import numpy as np
 import trimesh
 import sys
 import pointcloud_processor
-import tqdm
 from joblib import Parallel, delayed
 import time
 from collections import defaultdict
@@ -14,6 +13,7 @@ import os
 
 def unwrap_self(arg, **kwarg):
     return arg[0]._getitem(*(arg[1:]), **kwarg)
+
 
 class SURREAL(data.Dataset):
     def __init__(self, train,  npoints=2500, regular_sampling = False, normal=False, data_augmentation_Z_rotation=False, data_augmentation_Z_rotation_range=360, data_augmentation_3D_rotation=False, cache=True):
@@ -35,8 +35,6 @@ class SURREAL(data.Dataset):
             self.path_3 = "mypath" #you can add you own generated data if you want (edit len(dataset))
         else:
             self.path = "./data/dataset-surreal-val/"
-
-
 
         self.datas  = []
         if self.cache:
@@ -97,7 +95,6 @@ class SURREAL(data.Dataset):
         points, _, _ = pointcloud_processor.center_bounding_box(points)
 
         return torch.from_numpy(points.astype(np.float32)).contiguous().unsqueeze(0)
-    
 
     def __getitem__(self, index):
         # LOAD a training sample
@@ -133,7 +130,6 @@ class SURREAL(data.Dataset):
             points = points[random_sample]
 
         return points, random_sample, rot_matrix, index
-
 
     def __len__(self):
         if self.train:
