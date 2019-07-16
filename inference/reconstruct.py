@@ -41,8 +41,6 @@ def regress(points):
         loss_net.backward()
         global_variables.optimizer.step()
         loss = loss_net.item()
-        if i%10 == 0:
-            print(loss)
         i = i + 1
     with torch.no_grad():
         if global_variables.opt.HR:
@@ -131,8 +129,6 @@ def run(input, scalefactor):
 
     #START REGRESSION
     print("start regression...")
-    print(bestLoss)
-    print(best_theta)
     # rotate with optimal angle
     rot_matrix = np.array([[np.cos(best_theta), 0, np.sin(best_theta)], [0, 1, 0], [- np.sin(best_theta), 0,  np.cos(best_theta)]])
     rot_matrix = torch.from_numpy(rot_matrix).float().cuda()

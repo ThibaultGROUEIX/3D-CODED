@@ -15,7 +15,7 @@ This repository contains the source codes for the paper [3D-CODED : 3D Correspon
 ## Download the repo
 git clone git@github.com:ThibaultGROUEIX/3D-CODED.git
 ## Pip dependencies - python 3.7
-pip install pandas visdom trimesh sklearn shapely pytest torch torchvision joblib
+pip install pandas visdom trimesh==2.36.25 sklearn shapely pytest torch torchvision joblib
 # Build chamfer distance 
 cd 3D-CODED/extension; python setup.py install
 # you're done ! Congrats :)
