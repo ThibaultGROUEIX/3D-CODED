@@ -148,7 +148,7 @@ if __name__ == '__main__':
     np.random.seed(manualSeed)
 
     print('Testing Shapenet dataset')
-    d = SURREAL(train=True, cache=True, data_augmentation_3D_rotation=False )
+    d = SURREAL(train=True, cache=True, regular_sampling=True, data_augmentation_3D_rotation=False )
     a,b,c,d   = d[0]
     print(a,b,c,d)
     min_vals = torch.min(a, 0)[0]

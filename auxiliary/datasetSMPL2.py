@@ -91,7 +91,7 @@ if __name__ == '__main__':
     np.random.seed(manualSeed)
 
     print('Testing Shapenet dataset')
-    d = SMPL(train=True)
+    d = SMPL(train=True, regular=True)
     a,b,c,   = d[0]
     print(a,b,c)
     min_vals = torch.min(a, 0)[0]
