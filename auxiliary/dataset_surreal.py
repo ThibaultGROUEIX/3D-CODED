@@ -73,7 +73,7 @@ class SURREAL(data.Dataset):
             end = time.time()
             print("Ellapsed time : " , end - start)
         # template
-        self.mesh = trimesh.load("./data/template/template.ply")
+        self.mesh = trimesh.load("./data/template/template.ply", process=False)
         self.prop = pointcloud_processor.get_vertex_normalised_area(self.mesh)
         assert (np.abs(np.sum(self.prop)- 1)<0.001), "Propabilities do not sum to 1!)" 
 
