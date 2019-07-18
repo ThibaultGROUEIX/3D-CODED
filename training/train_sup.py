@@ -49,7 +49,7 @@ opt.manualSeed = 1 #random.randint(1, 10000)  # fix seed
 print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
-np.random.seed(0)
+np.random.seed(opt.manualSeed)
 L2curve_train_smpl = []
 L2curve_val_smlp = []
 
