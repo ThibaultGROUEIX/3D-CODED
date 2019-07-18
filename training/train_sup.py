@@ -56,7 +56,7 @@ logname = os.path.join(dir_name, 'log.txt')
 
 blue = lambda x: '\033[94m' + x + '\033[0m'
 
-opt.manualSeed = random.randint(1, 10000)  # fix seed
+opt.manualSeed = 1#random.randint(1, 10000)  # fix seed
 print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
@@ -118,6 +118,7 @@ for epoch in range(opt.nepoch):
         loss_net = torch.mean(
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
         loss_net.backward()
+        print(loss, points[0,0])
         train_loss_L2_SURREAL.update(loss_net.item())
         optimizer.step()  # gradient update
 
