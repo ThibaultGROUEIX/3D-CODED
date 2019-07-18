@@ -118,7 +118,7 @@ for epoch in range(opt.nepoch):
         loss_net = torch.mean(
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
         loss_net.backward()
-        print(loss, points[0,0])
+        print(loss_net, points[0,0])
         os.exist()
         train_loss_L2_SURREAL.update(loss_net.item())
         optimizer.step()  # gradient update
