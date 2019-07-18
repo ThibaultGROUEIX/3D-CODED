@@ -83,6 +83,7 @@ class SMPL(data.Dataset):
 
 
 if __name__ == '__main__':
+    import random
     manualSeed = 1#random.randint(1, 10000)  # fix seed
     print("Random Seed: ", manualSeed)
     random.seed(manualSeed)
