@@ -107,6 +107,7 @@ for epoch in range(opt.nepoch):
         pointsReconstructed = network.forward_idx(points, idx)  # forward pass
         loss_net = torch.mean(
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
+        print(loss_net, points[0,0])
         loss_net.backward()
         train_loss_L2_smpl.update(loss_net.item())
         optimizer.step()  # gradient update
