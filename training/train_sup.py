@@ -60,6 +60,7 @@ opt.manualSeed = 1#random.randint(1, 10000)  # fix seed
 print("Random Seed: ", opt.manualSeed)
 random.seed(opt.manualSeed)
 torch.manual_seed(opt.manualSeed)
+np.random.seed(opt.manualSeed)
 L2curve_train_SURREAL = []
 L2curve_val_SURREAL = []
 
@@ -119,7 +120,7 @@ for epoch in range(opt.nepoch):
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
         loss_net.backward()
         print(loss_net, points[0,0])
-        os.exist()
+        os.exit()
         train_loss_L2_SURREAL.update(loss_net.item())
         optimizer.step()  # gradient update
 
