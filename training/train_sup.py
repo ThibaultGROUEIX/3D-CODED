@@ -20,7 +20,7 @@ thread.start_new_thread(os.system, ('visdom -p 8888 > /dev/null 2>&1',))
 # =============PARAMETERS======================================== #
 parser = argparse.ArgumentParser()
 parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
-parser.add_argument('--workers', type=int, help='number of data loading workers', default=0)
+parser.add_argument('--workers', type=int, help='number of data loading workers', default=8)
 parser.add_argument('--nepoch', type=int, default=100, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='optional reload model path')
 parser.add_argument('--env', type=str, default="3DCODED_supervised", help='visdom environment')
@@ -119,8 +119,6 @@ for epoch in range(opt.nepoch):
         loss_net = torch.mean(
                 (pointsReconstructed - points.transpose(2, 1).contiguous()) ** 2)
         loss_net.backward()
-        print(loss_net, points[0,0])
-        os.exit()
         train_loss_L2_SURREAL.update(loss_net.item())
         optimizer.step()  # gradient update
 

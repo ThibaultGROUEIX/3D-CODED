@@ -125,7 +125,6 @@ class SURREAL(data.Dataset):
 
         # Resample according to triangles area
         random_sample = 0
-        print(self.prop)
 
         if self.regular_sampling:
             random_sample = np.random.choice(6890, size=self.npoints, p=self.prop)
