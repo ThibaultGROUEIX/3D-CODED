@@ -70,6 +70,7 @@ class SMPL(data.Dataset):
             a = torch.FloatTensor(3)
             points = points + (a.uniform_(-1,1) * 0.03).unsqueeze(0).expand(-1, 3)
         random_sample = np.random.choice(6890, size=2500, p=self.prop)
+        print(self.prop)
         if self.regular_sampling:
             points = points[random_sample]
         return points, random_sample, index
