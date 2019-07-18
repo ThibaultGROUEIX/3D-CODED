@@ -83,12 +83,17 @@ class SMPL(data.Dataset):
 
 
 if __name__ == '__main__':
+    manualSeed = 1#random.randint(1, 10000)  # fix seed
+    print("Random Seed: ", manualSeed)
+    random.seed(manualSeed)
+    torch.manual_seed(manualSeed)
+    np.random.seed(manualSeed)
+
     print('Testing Shapenet dataset')
     d = SMPL(train=True)
-    import visdom
-
-    vis = visdom.Visdom(port=8888, env="test-rot")
-    for i in range(30):
-        mesh = pymesh.form_mesh( vertices = d[0][0].numpy(), faces = np.array([[0,0,0]]))
-        pymesh.save_mesh("/home/thibault/test-rot/" + str(i)+".ply",mesh)
-    os.exit()
+    a,b,c,   = d[0]
+    print(a,b,c)
+    min_vals = torch.min(a, 0)[0]
+    max_vals = torch.max(a, 0)[0]
+    print(min_vals)
+    print(max_vals)

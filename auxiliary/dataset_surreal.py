@@ -139,9 +139,14 @@ class SURREAL(data.Dataset):
 
 
 if __name__ == '__main__':
-    print('Testing Shapenet dataset')
-    d = SURREAL(train=False, cache=True, data_augmentation_3D_rotation=True )
+    manualSeed = 1#random.randint(1, 10000)  # fix seed
+    print("Random Seed: ", manualSeed)
+    random.seed(manualSeed)
+    torch.manual_seed(manualSeed)
+    np.random.seed(manualSeed)
 
+    print('Testing Shapenet dataset')
+    d = SURREAL(train=True, cache=True, data_augmentation_3D_rotation=False )
     a,b,c,d   = d[0]
     print(a,b,c,d)
     min_vals = torch.min(a, 0)[0]
