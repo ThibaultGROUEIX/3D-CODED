@@ -90,10 +90,12 @@ if __name__ == '__main__':
     global_variables.network.eval()
 
     neigh = NearestNeighbors(1, 0.4)
-    opt.manualSeed = random.randint(1, 10000) # fix seed
-    # print("Random Seed: ", opt.manualSeed)
+    
+    opt.manualSeed = 1 #random.randint(1, 10000)  # fix seed
+    print("Random Seed: ", opt.manualSeed)
     random.seed(opt.manualSeed)
     torch.manual_seed(opt.manualSeed)
+    np.random.seed(opt.manualSeed)
 
     start = time.time()
     print("computing correspondences for " + opt.inputA + " and " + opt.inputB)
