@@ -81,6 +81,5 @@ def test_trained_nets():
             val_loss_L2_SURREAL.update(loss_net.item())  
 
         print("test loss: ", val_loss_L2_SURREAL.avg)       
-    assert(val_loss_L2_SURREAL.avg < 0.0002)
 
 test_trained_nets()
