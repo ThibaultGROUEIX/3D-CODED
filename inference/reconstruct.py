@@ -4,7 +4,7 @@ import torch.utils.data
 import sys
 sys.path.append('./auxiliary/')
 from model import *
-from utils import *
+from auxiliary.utils import *
 from ply import *
 import sys
 import torch.optim as optim

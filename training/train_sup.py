@@ -6,6 +6,8 @@ import torch
 import torch.optim as optim
 import sys
 sys.path.append('./auxiliary/')
+sys.path.append("/app/python/")
+
 from datasetSMPL2 import *
 from model import *
 from utils import *

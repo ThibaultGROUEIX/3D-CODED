@@ -7,12 +7,13 @@ import sys
 sys.path.append('./auxiliary/')
 # from datasetFaust import *
 from model import *
-from utils import *
+from auxiliary.utils import *
 from ply import *
 import reconstruct
 import time
 from sklearn.neighbors import NearestNeighbors
 sys.path.append("./extension/")
+sys.path.append("/app/python/")
 import dist_chamfer as ext
 distChamfer =  ext.chamferDist()
 import visdom
@@ -86,6 +87,7 @@ if __name__ == '__main__':
     global_variables.network.cuda()
     global_variables.network.apply(weights_init)
     if opt.model != '':
+        print("using ", opt.model)
         global_variables.network.load_state_dict(torch.load(opt.model))
     global_variables.network.eval()
 

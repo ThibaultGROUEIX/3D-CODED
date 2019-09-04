@@ -4,7 +4,7 @@
 source activate pytorch-sources
 
 ########PUT YOUR OWN PATH HERE ################################
-export PATH_DATASET=/home/thibault/Downloads/MPI-FAUST/test/scans
+export PATH_DATASET=./export
 ################################################################
 
 
