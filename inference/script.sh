@@ -1,10 +1,7 @@
  #!/usr/bin/bash
 
-###compute results for faust inter challenge
-source activate pytorch-sources
-
 ########PUT YOUR OWN PATH HERE ################################
-export PATH_DATASET=/home/theo/Documents/Project/3D-CODED/data/MPI-FAUST/test/scans_processed
+export PATH_DATASET=./export
 ################################################################
 
 

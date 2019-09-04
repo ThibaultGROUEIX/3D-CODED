@@ -6,7 +6,7 @@ import torch.utils.data
 from torch.autograd import Variable
 import numpy as np
 import torch.nn.functional as F
-from utils import sampleSphere
+from my_utils import sampleSphere
 import trimesh
 
 #UTILITIES

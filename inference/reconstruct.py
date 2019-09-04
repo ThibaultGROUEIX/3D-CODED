@@ -3,8 +3,9 @@ import numpy as np
 import torch.utils.data
 import sys
 sys.path.append('./auxiliary/')
+sys.path.append('./')
 from model import *
-from utils import *
+from my_utils import *
 from ply import *
 import sys
 import torch.optim as optim
@@ -134,7 +135,7 @@ def run(input, scalefactor):
     rot_matrix = np.array([[np.cos(best_theta), 0, np.sin(best_theta)], [0, 1, 0], [- np.sin(best_theta), 0,  np.cos(best_theta)]])
     rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
     points2 = torch.matmul(rot_matrix, points)
-    mesh_tmp = trimesh.Trimesh(vertices=points2[0].transpose(1,0).data.cpu().numpy(), faces=global_variables.network.mesh.faces)
+    mesh_tmp = trimesh.Trimesh(vertices=points2[0].transpose(1,0).data.cpu().numpy(), faces=global_variables.network.mesh.faces, process=False)
     bbox = np.array([[np.max(mesh_tmp.vertices[:,0]), np.max(mesh_tmp.vertices[:,1]), np.max(mesh_tmp.vertices[:,2])], [np.min(mesh_tmp.vertices[:,0]), np.min(mesh_tmp.vertices[:,1]), np.min(mesh_tmp.vertices[:,2])]])
     norma = torch.from_numpy((bbox[0] + bbox[1]) / 2).float().cuda()
     norma2 = norma.unsqueeze(1).expand(3,points2.size(2)).contiguous()

@@ -1,7 +1,7 @@
 from __future__ import print_function
 import torch.utils.data as data
 import torch
-from utils import *
+from my_utils import *
 import numpy as np
 import pymesh
 

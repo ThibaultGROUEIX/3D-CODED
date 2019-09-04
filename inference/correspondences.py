@@ -5,9 +5,10 @@ import numpy as np
 import torch
 import sys
 sys.path.append('./auxiliary/')
+sys.path.append('./')
 # from datasetFaust import *
 from model import *
-from utils import *
+from my_utils import *
 from ply import *
 import reconstruct
 import time
@@ -75,7 +76,6 @@ if __name__ == '__main__':
 
     opt = parser.parse_args()
     global_variables.opt = opt
-    vis = visdom.Visdom(port=9000, env=opt.env)
 
     distChamfer =  ext.chamferDist()
 

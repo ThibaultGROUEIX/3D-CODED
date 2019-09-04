@@ -8,7 +8,7 @@ import sys
 sys.path.append('./auxiliary/')
 from datasetSMPL2 import *
 from model import *
-from utils import *
+from my_utils import *
 from ply import *
 import os
 import json
