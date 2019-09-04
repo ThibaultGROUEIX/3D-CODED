@@ -30,11 +30,11 @@ class SURREAL(data.Dataset):
         # PATH  : YOU MAY NEED TO EDIT THOSE IF YOU GENERATE YOUR OWN SYNTHETIC MODELS
         # Not used when flag "cache" is True
         if self.train:
-            self.path = "./data/dataset-surreal/"
-            self.path_2 = "./data/dataset-bent/"
+            self.path = "./data/data/dataset_centered/"
+            self.path_2 = "./data/data/datase_augmented/"
             self.path_3 = "mypath" #you can add you own generated data if you want (edit len(dataset))
         else:
-            self.path = "./data/dataset-surreal-val/"
+            self.path = "./data/data/dataset-gaussian-val/"
 
         self.datas  = []
         if self.cache:

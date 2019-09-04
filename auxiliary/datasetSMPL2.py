@@ -14,11 +14,11 @@ class SMPL(data.Dataset):
         self.npoints = npoints
         # PATH  : YOU PROBABLY NEED TO EDIT THOSE
         if self.train:
-            self.path = "./data/dataset-surreal/"
-            self.path_2 = "./data/dataset-bent/"
+            self.path = "./data/data/dataset_centered/"
+            self.path_2 = "./data/data/dataset_augmented/"
             self.path_3 = "mypath" #you can add you own generated data if you want (edit len(dataset))
         else:
-            self.path = "./data/dataset-surreal-val/"
+            self.path = "./data/data/dataset-gaussian-val/"
 
         # template
         self.mesh = pymesh.load_mesh("./data/template/template.ply")
