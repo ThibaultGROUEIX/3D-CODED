@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import trimesh
+import os
 
 def test_orientation(input_mesh):
     """
@@ -13,7 +14,7 @@ def test_orientation(input_mesh):
     extent = bbox[0] - bbox[1]
     if not np.argmax(np.abs(extent)) == 1:
         print("The widest axis is not the Y axis, you should make sure the mesh is aligned on the Y axis for the autoencoder to work (check out the example in /data)")
-    return 
+    return
 
 def clean(input_mesh):
     """
@@ -70,8 +71,6 @@ def rot(input_mesh,  theta = np.pi/2):
 
     mesh = trimesh.Trimesh(vertices=point_set, faces=input_mesh.faces, process = False)
     return mesh
-
-
 
 #initialize the weighs of the network for Convolutional layers and batchnorm layers
 def weights_init(m):
@@ -138,12 +137,34 @@ def get_colors(num_colors=10):
   return colors
 
 
+CHUNK_SIZE = 150
+lenght_line = 60
+def my_get_n_random_lines(path, n=5):
+    MY_CHUNK_SIZE = lenght_line * (n+2)
+    lenght = os.stat(path).st_size
+    with open(path, 'r') as file:
+            file.seek(random.randint(400, lenght - MY_CHUNK_SIZE))
+            chunk = file.read(MY_CHUNK_SIZE)
+            lines = chunk.split(os.linesep)
+            return lines[1:n+1]
 
+def sampleSphere(N):
+
+    rand = np.random.rand(N)
+
+    theta = 2*np.pi*np.random.rand(N)
+    phi = np.arccos(1 - 2*np.random.rand(N))
+    x = np.sin(phi) * np.cos(theta)
+    y = np.sin(phi) * np.sin(theta)
+    z = np.cos(phi)
+
+    sphere = np.array([x,y,z]).transpose(1,0)
+
+    return sphere
 
 if __name__ == '__main__':
 
   #To make your color choice reproducible, uncomment the following line:
   #random.seed(10)
 
-  colors = get_colors(10)
-  print("Your colors:",colors)
+  sampleSphere(1000)

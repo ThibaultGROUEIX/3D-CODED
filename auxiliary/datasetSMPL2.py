@@ -14,11 +14,11 @@ class SMPL(data.Dataset):
         self.npoints = npoints
         # PATH  : YOU PROBABLY NEED TO EDIT THOSE
         if self.train:
-            self.path = "./data/dataset-surreal/"
-            self.path_2 = "./data/dataset-bent/"
+            self.path = "./data/data-surreal/dataset_centered/"
+            self.path_2 = "./data/data-surreal/dataset_augmented/"
             self.path_3 = "mypath" #you can add you own generated data if you want (edit len(dataset))
         else:
-            self.path = "./data/dataset-surreal-val/"
+            self.path = "./data/data-surreal/dataset-gaussian-val/"
 
         # template
         self.mesh = pymesh.load_mesh("./data/template/template.ply")
@@ -35,6 +35,7 @@ class SMPL(data.Dataset):
         self.prop = prop # prop is the sum of adjacent area of each vertex divided by total area.
 
     def __getitem__(self, index):
+
         try:
             if index < 200000:
                 input = pymesh.load_mesh(self.path + str(index) + ".ply")

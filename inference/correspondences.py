@@ -44,7 +44,6 @@ def compute_correspondances(source_p, source_reconstructed_p, target_p, target_r
         closest_points = target_reconstructed.vertices[idx_knn]
         closest_points = np.mean(closest_points, 1, keepdims=False)
 
-
         # project on target
         if global_variables.opt.project_on_target:
             print("projection on target...")
@@ -54,10 +53,9 @@ def compute_correspondances(source_p, source_reconstructed_p, target_p, target_r
             closest_points = np.mean(closest_points, 1, keepdims=False)
 
         # save output
+        np.savetxt("results/correspondences.txt", closest_points, fmt='%1.10f')
         mesh = trimesh.Trimesh(vertices=closest_points, faces=source.faces, process=False)
         mesh.export("results/correspondences.ply")
-        np.savetxt("results/correspondences.txt", closest_points, fmt='%1.10f')
-        return
 
 if __name__ == '__main__':
 
@@ -77,7 +75,7 @@ if __name__ == '__main__':
 
     opt = parser.parse_args()
     global_variables.opt = opt
-    vis = visdom.Visdom(port=8888, env=opt.env)
+    vis = visdom.Visdom(port=9000, env=opt.env)
 
     distChamfer =  ext.chamferDist()
 

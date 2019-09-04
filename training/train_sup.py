@@ -22,6 +22,7 @@ parser.add_argument('--workers', type=int, help='number of data loading workers'
 parser.add_argument('--nepoch', type=int, default=100, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='optional reload model path')
 parser.add_argument('--env', type=str, default="3DCODED_supervised", help='visdom environment')
+parser.add_argument('--training_id', type=str, default=None,help='training name')
 
 opt = parser.parse_args()
 print(opt)
@@ -35,10 +36,13 @@ distChamfer =  ext.chamferDist()
 
 # =============DEFINE stuff for logs ======================================== #
 # Launch visdom for visualization
-vis = visdom.Visdom(port=8888, env=opt.env)
+vis = visdom.Visdom(port=9000, env=opt.env)
 now = datetime.datetime.now()
 save_path = now.isoformat()
-dir_name = os.path.join('log', save_path)
+if opt.training_id is not None:
+    dir_name = os.path.join('log',opt.training_id)
+else:
+     dir_name = os.path.join('log', save_path)
 if not os.path.exists(dir_name):
     os.mkdir(dir_name)
 logname = os.path.join(dir_name, 'log.txt')
@@ -61,11 +65,9 @@ tmp_val_loss = AverageValueMeter()
 
 # ===================CREATE DATASET================================= #
 dataset = SMPL(train=True, regular = True)
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
-                                         shuffle=True, num_workers=int(opt.workers))
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,shuffle=True, num_workers=int(opt.workers))
 dataset_smpl_test = SMPL(train=False)
-dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,
-                                         shuffle=False, num_workers=int(opt.workers))
+dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,shuffle=False, num_workers=int(opt.workers))
 len_dataset = len(dataset)
 # ========================================================== #
 
@@ -159,7 +161,7 @@ for epoch in range(opt.nepoch):
                             ),
                             )
             print('[%d: %d/%d] test smlp loss:  %f' % (epoch, i, len_dataset / 32, loss_net.item()))
-      
+
 
         # UPDATE CURVES
         L2curve_train_smpl.append(train_loss_L2_smpl.avg)
