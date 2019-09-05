@@ -2,6 +2,7 @@ import random
 import numpy as np
 import trimesh
 import os
+import torch
 
 def test_orientation(input_mesh):
     """
@@ -87,6 +88,17 @@ def adjust_learning_rate(optimizer, epoch, phase):
     if (epoch%phase==(phase-1)):
         for param_group in optimizer.param_groups:
             param_group['lr'] = param_group['lr']/10.
+
+
+def plant_seeds(randomized_seed=False):
+    if randomized_seed:
+        manualSeed = random.randint(1, 10000)
+    else:
+        manualSeed = 1
+    print("Random Seed: ", manualSeed)
+    random.seed(manualSeed)
+    torch.manual_seed(manualSeed)
+    np.random.seed(manualSeed)
 
 
 class AverageValueMeter(object):

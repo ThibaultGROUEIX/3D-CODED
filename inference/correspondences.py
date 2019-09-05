@@ -1,14 +1,16 @@
 from __future__ import print_function
+import sys
+sys.path.append('./auxiliary/')
+sys.path.append('./')
+import my_utils
+my_utils.plant_seeds(randomized_seed=False)
+print("fixed seed")
 import argparse
 import random
 import numpy as np
 import torch
-import sys
-sys.path.append('./auxiliary/')
-sys.path.append('./')
 # from datasetFaust import *
 from model import *
-from my_utils import *
 from ply import *
 import reconstruct
 import time
@@ -16,10 +18,9 @@ from sklearn.neighbors import NearestNeighbors
 sys.path.append("./extension/")
 import dist_chamfer as ext
 distChamfer =  ext.chamferDist()
-import visdom
 import global_variables
 import trimesh
-
+import torch
 
 def compute_correspondances(source_p, source_reconstructed_p, target_p, target_reconstructed_p):
     """
@@ -59,7 +60,6 @@ def compute_correspondances(source_p, source_reconstructed_p, target_p, target_r
         mesh.export("results/correspondences.ply")
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--HR', type=int, default=1, help='Use high Resolution template for better precision in the nearest neighbor step ?')
     parser.add_argument('--nepoch', type=int, default=3000, help='number of epochs to train for during the regression step')
@@ -82,16 +82,12 @@ if __name__ == '__main__':
     # load network
     global_variables.network = AE_AtlasNet_Humans(num_points=opt.num_points)
     global_variables.network.cuda()
-    global_variables.network.apply(weights_init)
+    global_variables.network.apply(my_utils.weights_init)
     if opt.model != '':
         global_variables.network.load_state_dict(torch.load(opt.model))
     global_variables.network.eval()
 
     neigh = NearestNeighbors(1, 0.4)
-    opt.manualSeed = random.randint(1, 10000) # fix seed
-    # print("Random Seed: ", opt.manualSeed)
-    random.seed(opt.manualSeed)
-    torch.manual_seed(opt.manualSeed)
 
     start = time.time()
     print("computing correspondences for " + opt.inputA + " and " + opt.inputB)

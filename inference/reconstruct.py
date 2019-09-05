@@ -116,7 +116,7 @@ def run(input, scalefactor):
             pointsReconstructed = torch.matmul(pointsReconstructed, rot_matrix.transpose(1,0))
             bestPoints = pointsReconstructed
 
-    # print("best loss and angle : ", bestLoss.item(), best_theta)
+    print("best loss and angle : ", bestLoss.item(), best_theta)
     val_loss.update(bestLoss.item())
 
     if global_variables.opt.HR:

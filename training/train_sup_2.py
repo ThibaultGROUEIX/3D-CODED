@@ -22,7 +22,7 @@ import random
 import numpy as np
 import torch
 import torch.optim as optim
-from datasetSMPL2 import *
+from dataset_surreal import *
 from model import *
 from ply import *
 import os
@@ -64,7 +64,6 @@ logname = os.path.join(dir_name, 'log.txt')
 
 blue = lambda x: '\033[94m' + x + '\033[0m'
 
-
 L2curve_train_smpl = []
 L2curve_val_smlp = []
 
@@ -76,9 +75,9 @@ tmp_val_loss = my_utils.AverageValueMeter()
 
 
 # ===================CREATE DATASET================================= #
-dataset = SMPL(train=True, regular = True)
+dataset = SURREAL(train=True, regular_sampling = True)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,shuffle=True, num_workers=int(opt.workers))
-dataset_smpl_test = SMPL(train=False)
+dataset_smpl_test = SURREAL(train=False)
 dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,shuffle=False, num_workers=int(opt.workers))
 len_dataset = len(dataset)
 # ========================================================== #
