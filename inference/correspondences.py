@@ -3,7 +3,7 @@ import sys
 sys.path.append('./auxiliary/')
 sys.path.append('./')
 import my_utils
-my_utils.plant_seeds(randomized_seed=False)
+my_utils.plant_seeds(randomized_seed=True)
 print("fixed seed")
 import argparse
 import random

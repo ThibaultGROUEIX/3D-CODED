@@ -7,7 +7,9 @@
 # TODO add superquadrics loss (check how probas are predicted in original paper)
 # TODO add learned gradient descent
 # TODO add nice logging
-# TODO
+# TODO add reprojection loss if single-view-recons
+# TODO improve print statement
+# TODO implement multi-gpu training and compare performance
 
 from __future__ import print_function
 import sys
@@ -78,7 +80,7 @@ tmp_val_loss = my_utils.AverageValueMeter()
 dataset = SURREAL(train=True, regular_sampling = True)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,shuffle=True, num_workers=int(opt.workers))
 dataset_smpl_test = SURREAL(train=False)
-dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,shuffle=False, num_workers=int(opt.workers))
+dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=5,shuffle=False, num_workers=int(opt.workers))
 len_dataset = len(dataset)
 # ========================================================== #
 
@@ -113,7 +115,7 @@ for epoch in range(opt.nepoch):
     network.train()
     for i, data in enumerate(dataloader, 0):
         optimizer.zero_grad()
-        points, idx,_ = data
+        points, idx,_ , _= data
         points = points.transpose(2, 1).contiguous()
         points = points.cuda()
         pointsReconstructed = network.forward_idx(points, idx)  # forward pass
@@ -148,7 +150,7 @@ for epoch in range(opt.nepoch):
         network.eval()
         val_loss_L2_smpl.reset()
         for i, data in enumerate(dataloader_smpl_test, 0):
-            points, fn, idx = data
+            points, fn, idx, _ = data
             points = points.transpose(2, 1).contiguous()
             points = points.cuda()
             pointsReconstructed = network(points)  # forward pass

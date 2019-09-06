@@ -7,7 +7,7 @@
 # TODO add superquadrics loss (check how probas are predicted in original paper)
 # TODO add learned gradient descent
 # TODO add nice logging
-# TODO
+# TODO try with larger batchsize while at Adobe
 
 from __future__ import print_function
 import sys
