@@ -14,10 +14,8 @@ import dist_chamfer as ext
 distChamfer =  ext.chamferDist()
 import global_variables
 import trimesh
+
 val_loss = AverageValueMeter()
-
-
-
 def regress(points):
     """
     search the latent space to global_variables. Optimize reconstruction using the Chamfer Distance
@@ -123,14 +121,14 @@ def run(input, scalefactor):
         faces_tosave = global_variables.network.mesh_HR.faces
     else:
         faces_tosave = global_variables.network.mesh.faces
-    
+
     # create initial guess
     mesh = trimesh.Trimesh(vertices=(bestPoints[0].data.cpu().numpy() + translation)/scalefactor, faces=global_variables.network.mesh.faces, process = False)
 
 
     #START REGRESSION
     print("start regression...")
-    
+
     # rotate with optimal angle
     rot_matrix = np.array([[np.cos(best_theta), 0, np.sin(best_theta)], [0, 1, 0], [- np.sin(best_theta), 0,  np.cos(best_theta)]])
     rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
@@ -147,7 +145,7 @@ def run(input, scalefactor):
     rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
     pointsReconstructed1[0] = pointsReconstructed1[0] + norma3
     pointsReconstructed1 = torch.matmul(pointsReconstructed1, rot_matrix.transpose(1,0))
-    
+
     # create optimal reconstruction
     meshReg = trimesh.Trimesh(vertices=(pointsReconstructed1[0].data.cpu().numpy()  + translation)/scalefactor, faces=faces_tosave, process=False)
 
@@ -169,7 +167,7 @@ def save(mesh, mesh_color, path, red, green, blue):
         'lst4Tite': green,
         'lst5Tite': blue,
         })
-    write_ply(filename=path, points=points2write, as_text=True, text=False, faces = pd.DataFrame(b.astype(int)), color = True)    
+    write_ply(filename=path, points=points2write, as_text=True, text=False, faces = pd.DataFrame(b.astype(int)), color = True)
 def reconstruct(input_p):
     """
     Recontruct a 3D shape by deforming a template
@@ -199,4 +197,3 @@ def reconstruct(input_p):
     save(mesh, global_variables.mesh_ref_LR, input_p[:-4] + "InitialGuess.ply", global_variables.red_LR, global_variables.green_LR, global_variables.blue_LR )
     save(meshReg, mesh_ref, input_p[:-4] + "FinalReconstruction.ply",  red, green, blue)
     # Save optimal reconstruction
-   

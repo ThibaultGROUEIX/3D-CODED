@@ -4,6 +4,14 @@ import trimesh
 import os
 import torch
 
+
+def int_2_boolean(x):
+    if x == 1:
+        return True
+    else:
+        return False
+
+
 def test_orientation(input_mesh):
     """
     This fonction tests wether widest axis of the input mesh is the Z axis
@@ -92,8 +100,10 @@ def adjust_learning_rate(optimizer, epoch, phase):
 
 def plant_seeds(randomized_seed=False):
     if randomized_seed:
+        print("Randomized seed")
         manualSeed = random.randint(1, 10000)
     else:
+        print("Used fix seed")
         manualSeed = 1
     print("Random Seed: ", manualSeed)
     random.seed(manualSeed)

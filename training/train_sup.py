@@ -1,13 +1,18 @@
 # TODO Change Dataloader : works -> Add release tag
 # TODO Fix seed
 # TODO add arg_parse file
-# TODO Build trainer class
+# TODO Build trainer class with abstract trainer.
 # TODO add cool new scripts from CycleConsistentCorrespondence
 # TODO add Theo's work as a Flag
 # TODO add superquadrics loss (check how probas are predicted in original paper)
 # TODO add learned gradient descent
 # TODO add nice logging
 # TODO try with larger batchsize while at Adobe
+# TODO : add a class template_point_sampling with a method .sample() to merge atlasnet and 3D-CODED
+# TODO : #TODO : Regress should be in the model
+# TODO : In dataset surreal. Keep only the loading of two large files
+# TODO : try to make things multi-gpu friendly and try it
+# TODO make a download script for mpi, (to be called in script.py), for data_surreal to be called in data_surreal, and for the trained_models.
 
 from __future__ import print_function
 import sys
