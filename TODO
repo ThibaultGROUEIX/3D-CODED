@@ -2,6 +2,7 @@
         .update readme
 # TODO Fix seed
 
+# os.mkdir empty folders initially
 # TODO add arg_parse file
 # TODO Build trainer class
 # TODO add cool new scripts from CycleConsistentCorrespondence
