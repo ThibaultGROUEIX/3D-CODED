@@ -1,30 +1,25 @@
-
 from __future__ import print_function
 import sys
+
 sys.path.append('./auxiliary/')
 sys.path.append('./')
 import my_utils
-
 import argparse
 import random
 import numpy as np
 import torch
 import torch.optim as optim
-
 import torch.nn as nn
-
-# from datasetFaust import *
-
 import model
-
 import ply
-import reconstruct
 import time
 from sklearn.neighbors import NearestNeighbors
+
 sys.path.append("./extension/")
 sys.path.append("/app/python/")
 import dist_chamfer as ext
-distChamfer =  ext.chamferDist()
+
+distChamfer = ext.chamferDist()
 import trimesh
 import torch
 import pandas as pd
@@ -33,9 +28,11 @@ from mpl_toolkits import mplot3d
 
 import matplotlib.pyplot as plt
 
+
 class Inference(object):
-    def __init__(self, HR=1, nepoch=3000, model_path= 'trained_models/sup_human_network_last.pth', num_points=6890, num_angles=100, clean=1, scale=1, project_on_target=0, save_path=None, LR_input=True):
-        self.LR_input =LR_input
+    def __init__(self, HR=1, nepoch=3000, model_path='trained_models/sup_human_network_last.pth', num_points=6890,
+                 num_angles=100, clean=1, scale=1, project_on_target=0, save_path=None, LR_input=True):
+        self.LR_input = LR_input
         self.HR = HR
         self.nepoch = nepoch
         self.model_path = model_path
@@ -44,7 +41,7 @@ class Inference(object):
         self.clean = clean
         self.scale = scale
         self.project_on_target = project_on_target
-        self.distChamfer =  ext.chamferDist()
+        self.distChamfer = ext.chamferDist()
 
         # load network
         self.network = model.AE_AtlasNet_Humans(num_points=self.num_points)
@@ -59,7 +56,7 @@ class Inference(object):
         self.mesh_ref = trimesh.load("./data/template/template_dense.ply", process=False)
         self.mesh_ref_LR = trimesh.load("./data/template/template.ply", process=False)
 
-        #load colors
+        # load colors
         self.red_LR = np.load("./data/template/red_LR.npy").astype("uint8")
         self.green_LR = np.load("./data/template/green_LR.npy").astype("uint8")
         self.blue_LR = np.load("./data/template/blue_LR.npy").astype("uint8")
@@ -88,7 +85,7 @@ class Inference(object):
             self.neigh.fit(source_reconstructed.vertices)
             idx_knn = self.neigh.kneighbors(source.vertices, return_distance=False)
 
-            #correspondances throught template
+            # correspondances throught template
             closest_points = target_reconstructed.vertices[idx_knn]
             closest_points = np.mean(closest_points, 1, keepdims=False)
 
@@ -108,7 +105,6 @@ class Inference(object):
             mesh = trimesh.Trimesh(vertices=closest_points, faces=source.faces, process=False)
             mesh.export("results/correspondences.ply")
 
-
     def forward(self, inputA="data/example_0.ply", inputB="data/example_1.ply", path=None):
         print("computing correspondences for " + inputA + " and " + inputB)
         start = time.time()
@@ -119,13 +115,16 @@ class Inference(object):
 
         # Compute the correspondences through the recontruction
         if self.save_path is None:
-            self.compute_correspondances(inputA, inputA[:-4] + "FinalReconstruction.ply", inputB, inputB[:-4] + "FinalReconstruction.ply", path)
+            self.compute_correspondances(inputA, inputA[:-4] + "FinalReconstruction.ply", inputB,
+                                         inputB[:-4] + "FinalReconstruction.ply", path)
         else:
-            self.compute_correspondances(inputA, os.path.join(self.save_path, inputA[-8:-4] +  "FinalReconstruction.ply"), inputB, os.path.join(self.save_path, inputB[-8:-4] + "FinalReconstruction.ply"), path)
+            self.compute_correspondances(inputA,
+                                         os.path.join(self.save_path, inputA[-8:-4] + "FinalReconstruction.ply"),
+                                         inputB,
+                                         os.path.join(self.save_path, inputB[-8:-4] + "FinalReconstruction.ply"), path)
 
         end = time.time()
         print("ellapsed time is ", end - start, " seconds !")
-
 
     def regress(self, points):
         """
@@ -142,7 +141,7 @@ class Inference(object):
         loss = 10
         i = 0
 
-        #learning loop
+        # learning loop
         while np.log(loss) > -9 and i < self.nepoch:
             self.optimizer.zero_grad()
             pointsReconstructed = self.network.decode(input_param)  # forward pass
@@ -155,7 +154,7 @@ class Inference(object):
         with torch.no_grad():
             if self.HR:
                 pointsReconstructed = self.network.decode_full(input_param)  # forward pass
-            else :
+            else:
                 pointsReconstructed = self.network.decode(input_param)  # forward pass
 
         print("loss reg : ", loss)
@@ -190,7 +189,8 @@ class Inference(object):
             print("Using a High_res input")
             points_LR = torch.from_numpy(input.vertices.astype(np.float32)).contiguous().unsqueeze(0)
 
-        input_LR_mesh = trimesh.Trimesh(vertices=(points_LR.squeeze().data.cpu().numpy() + translation)/scalefactor, faces=np.array([1,2,3]), process = False)
+        input_LR_mesh = trimesh.Trimesh(vertices=(points_LR.squeeze().data.cpu().numpy() + translation) / scalefactor,
+                                        faces=np.array([1, 2, 3]), process=False)
         if self.save_path is None:
             input_LR_mesh.export(path[:-4] + "DownsampledInput.ply")
         else:
@@ -204,12 +204,11 @@ class Inference(object):
         pointsReconstructed = self.network(points_LR)
         dist1, dist2 = distChamfer(points_LR.transpose(2, 1).contiguous(), pointsReconstructed)
         loss_net = (torch.mean(dist1)) + (torch.mean(dist2))
-        print("loss without rotation: ",  loss_net.item(), 0)        # ---- Search best angle for best reconstruction on the Y axis---
+        print("loss without rotation: ", loss_net.item(),
+              0)  # ---- Search best angle for best reconstruction on the Y axis---
 
-
-
-        x = np.linspace(-np.pi/2, np.pi/2, self.num_angles)
-        y = np.linspace(-np.pi/4, np.pi/4, self.num_angles//4)
+        x = np.linspace(-np.pi / 2, np.pi / 2, self.num_angles)
+        y = np.linspace(-np.pi / 4, np.pi / 4, self.num_angles // 4)
 
         THETA, PHI = np.meshgrid(x, y)
         Z = np.ndarray([THETA.shape[0], THETA.shape[1]])
@@ -218,29 +217,36 @@ class Inference(object):
                 if self.num_angles == 1:
                     theta = 0
                     phi = 0
-                theta = THETA[i,j]
-                phi = PHI[i,j]
+                theta = THETA[i, j]
+                phi = PHI[i, j]
 
                 #  Rotate mesh by theta and renormalise
-                rot_matrix = np.array([[np.cos(theta), 0, np.sin(theta)], [0, 1, 0], [- np.sin(theta), 0,  np.cos(theta)]])
+                rot_matrix = np.array(
+                    [[np.cos(theta), 0, np.sin(theta)], [0, 1, 0], [- np.sin(theta), 0, np.cos(theta)]])
                 rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
-                rot_matrix = torch.matmul(torch.from_numpy(np.array([[np.cos(phi),  np.sin(phi), 0],[-np.sin(phi), np.cos(phi), 0], [0, 0, 1],])).float().cuda(), rot_matrix)
+                rot_matrix = torch.matmul(torch.from_numpy(np.array(
+                    [[np.cos(phi), np.sin(phi), 0], [-np.sin(phi), np.cos(phi), 0], [0, 0, 1], ])).float().cuda(),
+                                          rot_matrix)
                 points2 = torch.matmul(rot_matrix, points_LR)
-                mesh_tmp = trimesh.Trimesh(process=False, use_embree=False,vertices=points2[0].transpose(1,0).data.cpu().numpy(), faces=self.network.mesh.faces)
-                #bbox
-                bbox = np.array([[np.max(mesh_tmp.vertices[:,0]), np.max(mesh_tmp.vertices[:,1]), np.max(mesh_tmp.vertices[:,2])], [np.min(mesh_tmp.vertices[:,0]), np.min(mesh_tmp.vertices[:,1]), np.min(mesh_tmp.vertices[:,2])]])
+                mesh_tmp = trimesh.Trimesh(process=False, use_embree=False,
+                                           vertices=points2[0].transpose(1, 0).data.cpu().numpy(),
+                                           faces=self.network.mesh.faces)
+                # bbox
+                bbox = np.array([[np.max(mesh_tmp.vertices[:, 0]), np.max(mesh_tmp.vertices[:, 1]),
+                                  np.max(mesh_tmp.vertices[:, 2])],
+                                 [np.min(mesh_tmp.vertices[:, 0]), np.min(mesh_tmp.vertices[:, 1]),
+                                  np.min(mesh_tmp.vertices[:, 2])]])
                 norma = torch.from_numpy((bbox[0] + bbox[1]) / 2).float().cuda()
 
-                norma2 = norma.unsqueeze(1).expand(3,points2.size(2)).contiguous()
+                norma2 = norma.unsqueeze(1).expand(3, points2.size(2)).contiguous()
                 points2[0] = points2[0] - norma2
 
                 # reconstruct rotated mesh
                 pointsReconstructed = self.network(points2)
                 dist1, dist2 = distChamfer(points2.transpose(2, 1).contiguous(), pointsReconstructed)
 
-
                 loss_net = (torch.mean(dist1)) + (torch.mean(dist2))
-                Z[i,j] = loss_net.item()
+                Z[i, j] = loss_net.item()
                 if loss_net < bestLoss:
                     print(theta, phi, loss_net)
                     bestLoss = loss_net
@@ -249,19 +255,20 @@ class Inference(object):
                     # unrotate the mesh
                     norma3 = norma.unsqueeze(0).expand(pointsReconstructed.size(1), 3).contiguous()
                     pointsReconstructed[0] = pointsReconstructed[0] + norma3
-                    rot_matrix = np.array([[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [- np.sin(-theta), 0,  np.cos(-theta)]])
+                    rot_matrix = np.array(
+                        [[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [- np.sin(-theta), 0, np.cos(-theta)]])
                     rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
-                    rot_matrix = torch.matmul(rot_matrix, torch.from_numpy(np.array([[np.cos(-phi),  np.sin(-phi), 0],[-np.sin(-phi), np.cos(-phi), 0], [0, 0, 1],])).float().cuda())
-                    pointsReconstructed = torch.matmul(pointsReconstructed, rot_matrix.transpose(1,0))
+                    rot_matrix = torch.matmul(rot_matrix, torch.from_numpy(np.array(
+                        [[np.cos(-phi), np.sin(-phi), 0], [-np.sin(-phi), np.cos(-phi), 0],
+                         [0, 0, 1], ])).float().cuda())
+                    pointsReconstructed = torch.matmul(pointsReconstructed, rot_matrix.transpose(1, 0))
                     bestPoints = pointsReconstructed
-
-
 
         try:
             fig = plt.figure()
             ax = plt.axes(projection='3d')
             ax.plot_surface(THETA, PHI, -Z, rstride=1, cstride=1,
-                cmap='magma', edgecolor='none', alpha=0.8)
+                            cmap='magma', edgecolor='none', alpha=0.8)
 
             ax.set_xlabel('THETA', fontsize=20)
             ax.set_ylabel('PHI', fontsize=20)
@@ -320,34 +327,41 @@ class Inference(object):
             faces_tosave = self.network.mesh.faces
 
         # create initial guess
-        mesh = trimesh.Trimesh(vertices=(bestPoints[0].data.cpu().numpy() + translation)/scalefactor, faces=self.network.mesh.faces, process = False)
+        mesh = trimesh.Trimesh(vertices=(bestPoints[0].data.cpu().numpy() + translation) / scalefactor,
+                               faces=self.network.mesh.faces, process=False)
         try:
-            plt.plot(X,Y)
+            plt.plot(X, Y)
             plt.savefig("curve.png")
         except:
             pass
-        #START REGRESSION
+        # START REGRESSION
         print("start regression...")
 
         # rotate with optimal angle
-        rot_matrix = np.array([[np.cos(best_theta), 0, np.sin(best_theta)], [0, 1, 0], [- np.sin(best_theta), 0,  np.cos(best_theta)]])
+        rot_matrix = np.array(
+            [[np.cos(best_theta), 0, np.sin(best_theta)], [0, 1, 0], [- np.sin(best_theta), 0, np.cos(best_theta)]])
         rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
         points2 = torch.matmul(rot_matrix, points)
-        mesh_tmp = trimesh.Trimesh(vertices=points2[0].transpose(1,0).data.cpu().numpy(), faces=self.network.mesh.faces, process=False)
-        bbox = np.array([[np.max(mesh_tmp.vertices[:,0]), np.max(mesh_tmp.vertices[:,1]), np.max(mesh_tmp.vertices[:,2])], [np.min(mesh_tmp.vertices[:,0]), np.min(mesh_tmp.vertices[:,1]), np.min(mesh_tmp.vertices[:,2])]])
+        mesh_tmp = trimesh.Trimesh(vertices=points2[0].transpose(1, 0).data.cpu().numpy(),
+                                   faces=self.network.mesh.faces, process=False)
+        bbox = np.array(
+            [[np.max(mesh_tmp.vertices[:, 0]), np.max(mesh_tmp.vertices[:, 1]), np.max(mesh_tmp.vertices[:, 2])],
+             [np.min(mesh_tmp.vertices[:, 0]), np.min(mesh_tmp.vertices[:, 1]), np.min(mesh_tmp.vertices[:, 2])]])
         norma = torch.from_numpy((bbox[0] + bbox[1]) / 2).float().cuda()
-        norma2 = norma.unsqueeze(1).expand(3,points2.size(2)).contiguous()
+        norma2 = norma.unsqueeze(1).expand(3, points2.size(2)).contiguous()
         points2[0] = points2[0] - norma2
         pointsReconstructed1 = self.regress(points2)
         # unrotate with optimal angle
         norma3 = norma.unsqueeze(0).expand(pointsReconstructed1.size(1), 3).contiguous()
-        rot_matrix = np.array([[np.cos(-best_theta), 0, np.sin(-best_theta)], [0, 1, 0], [- np.sin(-best_theta), 0,  np.cos(-best_theta)]])
+        rot_matrix = np.array(
+            [[np.cos(-best_theta), 0, np.sin(-best_theta)], [0, 1, 0], [- np.sin(-best_theta), 0, np.cos(-best_theta)]])
         rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
         pointsReconstructed1[0] = pointsReconstructed1[0] + norma3
-        pointsReconstructed1 = torch.matmul(pointsReconstructed1, rot_matrix.transpose(1,0))
+        pointsReconstructed1 = torch.matmul(pointsReconstructed1, rot_matrix.transpose(1, 0))
 
         # create optimal reconstruction
-        meshReg = trimesh.Trimesh(vertices=(pointsReconstructed1[0].data.cpu().numpy()  + translation)/scalefactor, faces=faces_tosave, process=False)
+        meshReg = trimesh.Trimesh(vertices=(pointsReconstructed1[0].data.cpu().numpy() + translation) / scalefactor,
+                                  faces=faces_tosave, process=False)
 
         print("... Done!")
         return mesh, meshReg
@@ -357,17 +371,18 @@ class Inference(object):
         Home-made function to save a ply file with colors. A bit hacky
         """
         to_write = mesh.vertices
-        b = np.zeros((len(mesh.faces),4)) + 3
-        b[:,1:] = np.array(mesh.faces)
+        b = np.zeros((len(mesh.faces), 4)) + 3
+        b[:, 1:] = np.array(mesh.faces)
         points2write = pd.DataFrame({
-            'lst0Tite': to_write[:,0],
-            'lst1Tite': to_write[:,1],
-            'lst2Tite': to_write[:,2],
+            'lst0Tite': to_write[:, 0],
+            'lst1Tite': to_write[:, 1],
+            'lst2Tite': to_write[:, 2],
             'lst3Tite': red,
             'lst4Tite': green,
             'lst5Tite': blue,
-            })
-        ply.write_ply(filename=path, points=points2write, as_text=True, text=False, faces = pd.DataFrame(b.astype(int)), color = True)
+        })
+        ply.write_ply(filename=path, points=points2write, as_text=True, text=False, faces=pd.DataFrame(b.astype(int)),
+                      color=True)
 
     def reconstruct(self, input_p):
         """
@@ -379,9 +394,10 @@ class Inference(object):
         input = trimesh.load(input_p, process=False)
         scalefactor = 1.0
         if self.scale:
-            input, scalefactor = my_utils.scale(input, self.mesh_ref_LR) #scale input to have the same volume as mesh_ref_LR
+            input, scalefactor = my_utils.scale(input,
+                                                self.mesh_ref_LR)  # scale input to have the same volume as mesh_ref_LR
         if self.clean:
-            input = my_utils.clean(input) #remove points that doesn't belong to any edges
+            input = my_utils.clean(input)  # remove points that doesn't belong to any edges
         my_utils.test_orientation(input)
         mesh, meshReg = self.run(input, scalefactor, input_p)
 
@@ -397,30 +413,41 @@ class Inference(object):
             mesh_ref = self.mesh_ref
 
         if self.save_path is None:
-            self.save(mesh, self.mesh_ref_LR, input_p[:-4] + "InitialGuess.ply", self.red_LR, self.green_LR, self.blue_LR )
-            self.save(meshReg, mesh_ref, input_p[:-4] + "FinalReconstruction.ply",  red, green, blue)
+            self.save(mesh, self.mesh_ref_LR, input_p[:-4] + "InitialGuess.ply", self.red_LR, self.green_LR,
+                      self.blue_LR)
+            self.save(meshReg, mesh_ref, input_p[:-4] + "FinalReconstruction.ply", red, green, blue)
         else:
-            self.save(mesh, self.mesh_ref_LR, os.path.join(self.save_path, input_p[-8:-4] + "InitialGuess.ply"), self.red_LR, self.green_LR, self.blue_LR )
-            self.save(meshReg, mesh_ref, os.path.join(self.save_path, input_p[-8:-4] + "FinalReconstruction.ply"),  red, green, blue)
+            self.save(mesh, self.mesh_ref_LR, os.path.join(self.save_path, input_p[-8:-4] + "InitialGuess.ply"),
+                      self.red_LR, self.green_LR, self.blue_LR)
+            self.save(meshReg, mesh_ref, os.path.join(self.save_path, input_p[-8:-4] + "FinalReconstruction.ply"), red,
+                      green, blue)
 
         # Save optimal reconstruction
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--HR', type=int, default=1, help='Use high Resolution template for better precision in the nearest neighbor step ?')
-    parser.add_argument('--LR_input', type=int, default=1, help='Use high Resolution template for better precision in the nearest neighbor step ?')
-    parser.add_argument('--nepoch', type=int, default=3000, help='number of epochs to train for during the regression step')
-    parser.add_argument('--model_path', type=str, default = 'trained_models/sup_human_network_last.pth',  help='your path to the trained model')
-    parser.add_argument('--inputA', type=str, default =  "data/example_0.ply",  help='your path to mesh 0')
-    parser.add_argument('--inputB', type=str, default =  "data/example_1.ply",  help='your path to mesh 1')
-    parser.add_argument('--num_points', type=int, default = 6890,  help='number of points fed to poitnet')
-    parser.add_argument('--num_angles', type=int, default = 100,  help='number of angle in the search of optimal reconstruction. Set to 1, if you mesh are already facing the cannonical direction as in data/example_1.ply')
+    parser.add_argument('--HR', type=int, default=1,
+                        help='Use high Resolution template for better precision in the nearest neighbor step ?')
+    parser.add_argument('--LR_input', type=int, default=1,
+                        help='Use high Resolution template for better precision in the nearest neighbor step ?')
+    parser.add_argument('--nepoch', type=int, default=3000,
+                        help='number of epochs to train for during the regression step')
+    parser.add_argument('--model_path', type=str, default='trained_models/sup_human_network_last.pth',
+                        help='your path to the trained model')
+    parser.add_argument('--inputA', type=str, default="data/example_0.ply", help='your path to mesh 0')
+    parser.add_argument('--inputB', type=str, default="data/example_1.ply", help='your path to mesh 1')
+    parser.add_argument('--num_points', type=int, default=6890, help='number of points fed to poitnet')
+    parser.add_argument('--num_angles', type=int, default=100,
+                        help='number of angle in the search of optimal reconstruction. Set to 1, if you mesh are already facing the cannonical direction as in data/example_1.ply')
     parser.add_argument('--env', type=str, default="CODED", help='visdom environment')
     parser.add_argument('--clean', type=int, default=1, help='if 1, remove points that dont belong to any edges')
-    parser.add_argument('--scale', type=int, default=1, help='if 1, scale input mesh to have same volume as the template')
-    parser.add_argument('--project_on_target', type=int, default=0, help='if 1, projects predicted correspondences point on target mesh')
-    parser.add_argument('--randomize', type=int, default=0, help='if 1, projects predicted correspondences point on target mesh')
-
+    parser.add_argument('--scale', type=int, default=1,
+                        help='if 1, scale input mesh to have same volume as the template')
+    parser.add_argument('--project_on_target', type=int, default=0,
+                        help='if 1, projects predicted correspondences point on target mesh')
+    parser.add_argument('--randomize', type=int, default=0,
+                        help='if 1, projects predicted correspondences point on target mesh')
 
     opt = parser.parse_args()
 
@@ -432,7 +459,9 @@ if __name__ == '__main__':
     opt.randomize = my_utils.int_2_boolean(opt.randomize)
 
     my_utils.plant_seeds(randomized_seed=opt.randomize)
-    inf = Inference( HR=opt.HR, nepoch=opt.nepoch, model_path= opt.model_path, num_points=opt.num_points, num_angles=opt.num_angles, clean=opt.clean, scale=opt.scale, project_on_target=opt.project_on_target, LR_input=opt.LR_input)
+    inf = Inference(HR=opt.HR, nepoch=opt.nepoch, model_path=opt.model_path, num_points=opt.num_points,
+                    num_angles=opt.num_angles, clean=opt.clean, scale=opt.scale,
+                    project_on_target=opt.project_on_target, LR_input=opt.LR_input)
     inf.reconstruct((opt.inputA))
     # inf.forward(opt.inputA, opt.inputB)
     # inf.forward(opt.inputA, opt.inputA)
