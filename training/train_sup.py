@@ -1,16 +1,19 @@
 from __future__ import print_function
+import sys
+sys.path.append('./auxiliary/')
+sys.path.append('/app/python/')
+sys.path.append('./')
+import my_utils
+my_utils.plant_seeds(randomized_seed=False)
+print("fixed seed")
 import argparse
 import random
 import numpy as np
 import torch
 import torch.optim as optim
-import sys
-sys.path.append('./auxiliary/')
-sys.path.append("/app/python/")
 
-from datasetSMPL2 import *
+from dataset import *
 from model import *
-from utils import *
 from ply import *
 import os
 import json
@@ -24,6 +27,7 @@ parser.add_argument('--workers', type=int, help='number of data loading workers'
 parser.add_argument('--nepoch', type=int, default=100, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='optional reload model path')
 parser.add_argument('--env', type=str, default="3DCODED_supervised", help='visdom environment')
+parser.add_argument('--id', type=str, default=None,help='training name')
 
 opt = parser.parse_args()
 print(opt)
@@ -37,45 +41,42 @@ distChamfer =  ext.chamferDist()
 
 # =============DEFINE stuff for logs ======================================== #
 # Launch visdom for visualization
-vis = visdom.Visdom(port=8888, env=opt.env)
+vis = visdom.Visdom(port=9000, env=opt.env)
 now = datetime.datetime.now()
 save_path = now.isoformat()
-dir_name = os.path.join('log', save_path)
+if opt.id is not None:
+    dir_name = os.path.join('log',opt.id)
+else:
+     dir_name = os.path.join('log', save_path)
 if not os.path.exists(dir_name):
     os.mkdir(dir_name)
 logname = os.path.join(dir_name, 'log.txt')
 
 blue = lambda x: '\033[94m' + x + '\033[0m'
 
-opt.manualSeed = 1 #random.randint(1, 10000)  # fix seed
-print("Random Seed: ", opt.manualSeed)
-random.seed(opt.manualSeed)
-torch.manual_seed(opt.manualSeed)
-np.random.seed(opt.manualSeed)
+
 L2curve_train_smpl = []
 L2curve_val_smlp = []
 
 # meters to record stats on learning
-train_loss_L2_smpl = AverageValueMeter()
-val_loss_L2_smpl = AverageValueMeter()
-tmp_val_loss = AverageValueMeter()
+train_loss_L2_smpl = my_utils.AverageValueMeter()
+val_loss_L2_smpl = my_utils.AverageValueMeter()
+tmp_val_loss = my_utils.AverageValueMeter()
 # ========================================================== #
 
 
 # ===================CREATE DATASET================================= #
-dataset = SMPL(train=True, regular = True)
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
-                                         shuffle=True, num_workers=int(opt.workers))
-dataset_smpl_test = SMPL(train=False)
-dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,
-                                         shuffle=False, num_workers=int(opt.workers))
+dataset = SURREAL(train=True, regular_sampling = True)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,shuffle=True, num_workers=int(opt.workers))
+dataset_smpl_test = SURREAL(train=False)
+dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=5,shuffle=False, num_workers=int(opt.workers))
 len_dataset = len(dataset)
 # ========================================================== #
 
 # ===================CREATE network================================= #
 network = AE_AtlasNet_Humans()
 network.cuda()  # put network on GPU
-network.apply(weights_init)  # initialization of the weight
+network.apply(my_utils.weights_init)  # initialization of the weight
 if opt.model != '':
     network.load_state_dict(torch.load(opt.model))
     print(" Previous weight loaded ")
@@ -103,7 +104,7 @@ for epoch in range(opt.nepoch):
     network.train()
     for i, data in enumerate(dataloader, 0):
         optimizer.zero_grad()
-        points, idx,_ = data
+        points, idx,_ , _= data
         points = points.transpose(2, 1).contiguous()
         points = points.cuda()
         pointsReconstructed = network.forward_idx(points, idx)  # forward pass
@@ -138,7 +139,7 @@ for epoch in range(opt.nepoch):
         network.eval()
         val_loss_L2_smpl.reset()
         for i, data in enumerate(dataloader_smpl_test, 0):
-            points, fn, idx = data
+            points, fn, idx, _ = data
             points = points.transpose(2, 1).contiguous()
             points = points.cuda()
             pointsReconstructed = network(points)  # forward pass
@@ -162,7 +163,7 @@ for epoch in range(opt.nepoch):
                             ),
                             )
             print('[%d: %d/%d] test smlp loss:  %f' % (epoch, i, len_dataset / 32, loss_net.item()))
-      
+
 
         # UPDATE CURVES
         L2curve_train_smpl.append(train_loss_L2_smpl.avg)

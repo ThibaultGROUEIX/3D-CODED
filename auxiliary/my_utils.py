@@ -1,6 +1,16 @@
 import random
 import numpy as np
 import trimesh
+import os
+import torch
+
+
+def int_2_boolean(x):
+    if x == 1:
+        return True
+    else:
+        return False
+
 
 def test_orientation(input_mesh):
     """
@@ -13,9 +23,9 @@ def test_orientation(input_mesh):
     extent = bbox[0] - bbox[1]
     if not np.argmax(np.abs(extent)) == 1:
         print("The widest axis is not the Y axis, you should make sure the mesh is aligned on the Y axis for the autoencoder to work (check out the example in /data)")
-    return 
+    return
 
-def clean(input_mesh):
+def clean(input_mesh, prop):
     """
     This function remove faces, and vertex that doesn't belong to any face. Intended to be used before a feed forward pass in pointNet
     Input : mesh
@@ -28,9 +38,10 @@ def clean(input_mesh):
     faces = faces.reshape(-1)
     unique_points_index = np.unique(faces)
     unique_points = pts[unique_points_index]
+    new_prop = prop[unique_points_index]
     print("number of point after : " , np.shape(unique_points)[0])
     mesh = trimesh.Trimesh(vertices=unique_points, faces=np.array([[0,0,0]]), process=False)
-    return mesh
+    return mesh, new_prop
 
 
 def center(input_mesh):
@@ -71,8 +82,6 @@ def rot(input_mesh,  theta = np.pi/2):
     mesh = trimesh.Trimesh(vertices=point_set, faces=input_mesh.faces, process = False)
     return mesh
 
-
-
 #initialize the weighs of the network for Convolutional layers and batchnorm layers
 def weights_init(m):
     classname = m.__class__.__name__
@@ -88,6 +97,19 @@ def adjust_learning_rate(optimizer, epoch, phase):
     if (epoch%phase==(phase-1)):
         for param_group in optimizer.param_groups:
             param_group['lr'] = param_group['lr']/10.
+
+
+def plant_seeds(randomized_seed=False):
+    if randomized_seed:
+        print("Randomized seed")
+        manualSeed = random.randint(1, 10000)
+    else:
+        print("Used fix seed")
+        manualSeed = 1
+    print("Random Seed: ", manualSeed)
+    random.seed(manualSeed)
+    torch.manual_seed(manualSeed)
+    np.random.seed(manualSeed)
 
 
 class AverageValueMeter(object):
@@ -138,12 +160,34 @@ def get_colors(num_colors=10):
   return colors
 
 
+CHUNK_SIZE = 150
+lenght_line = 60
+def my_get_n_random_lines(path, n=5):
+    MY_CHUNK_SIZE = lenght_line * (n+2)
+    lenght = os.stat(path).st_size
+    with open(path, 'r') as file:
+            file.seek(random.randint(400, lenght - MY_CHUNK_SIZE))
+            chunk = file.read(MY_CHUNK_SIZE)
+            lines = chunk.split(os.linesep)
+            return lines[1:n+1]
 
+def sampleSphere(N):
+
+    rand = np.random.rand(N)
+
+    theta = 2*np.pi*np.random.rand(N)
+    phi = np.arccos(1 - 2*np.random.rand(N))
+    x = np.sin(phi) * np.cos(theta)
+    y = np.sin(phi) * np.sin(theta)
+    z = np.cos(phi)
+
+    sphere = np.array([x,y,z]).transpose(1,0)
+
+    return sphere
 
 if __name__ == '__main__':
 
   #To make your color choice reproducible, uncomment the following line:
   #random.seed(10)
 
-  colors = get_colors(10)
-  print("Your colors:",colors)
+  sampleSphere(1000)

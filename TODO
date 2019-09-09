@@ -1,0 +1,15 @@
+# TODO Change Dataloader : works -> Add release tag
+        .update readme
+# TODO Fix seed
+
+# os.mkdir empty folders initially
+# TODO add arg_parse file
+# TODO Build trainer class
+# TODO add cool new scripts from CycleConsistentCorrespondence
+# TODO add Theo's work as a Flag
+# TODO add superquadrics loss (check how probas are predicted in original paper)
+# TODO add learned gradient descent
+# TODO add nice logging
+# TODO add reprojection loss if single-view-recons
+# TODO improve print statement
+# TODO implement multi-gpu training and compare performance
