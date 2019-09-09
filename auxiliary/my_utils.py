@@ -46,7 +46,7 @@ def clean(input_mesh, prop=None):
         return mesh, new_prop
     else:
         return mesh
-    
+
 
 def center(input_mesh):
     """

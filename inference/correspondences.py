@@ -462,6 +462,6 @@ if __name__ == '__main__':
     inf = Inference(HR=opt.HR, nepoch=opt.nepoch, model_path=opt.model_path, num_points=opt.num_points,
                     num_angles=opt.num_angles, clean=opt.clean, scale=opt.scale,
                     project_on_target=opt.project_on_target, LR_input=opt.LR_input)
-    inf.reconstruct((opt.inputA))
-    # inf.forward(opt.inputA, opt.inputB)
+    # inf.reconstruct((opt.inputA))
+    inf.forward(opt.inputA, opt.inputB)
     # inf.forward(opt.inputA, opt.inputA)
