@@ -96,20 +96,17 @@ You need to make sure your meshes are preprocessed correctly :
 
 
 
-## Training the autoencoder
-
-#### Data  
-
-The generation process of the dataset is quite heavy so we provide our processed data. Should you want to reproduce the preprocessing, go to ```data/README.md```. Brace yourselve :-)
+## Training
 
 
-#### Install Pymesh
+<details><summary>#### Install Pymesh</summary>
 
 Follow the specific repo instruction [here](https://github.com/qnzhou/PyMesh).
 
 Pymesh is my favorite Geometry Processing Library for Python, it's developed by an Adobe researcher : [Qingnan Zhou](https://research.adobe.com/person/qingnan-zhou/). It can be tricky to set up. Trimesh is good alternative but requires a few code edits in this case.
 
-#### Options
+</details>
+<details><summary>#### Options</summary>
 
 ```python
 '--batchSize', type=int, default=32, help='input batch size'
@@ -119,31 +116,34 @@ Pymesh is my favorite Geometry Processing Library for Python, it's developed by 
 '--env', type=str, default="unsup-symcorrect-ratio", help='visdom environment'
 '--laplace', type=int, default=0, help='regularize towords 0 curvature, or template curvature'
 ```
+</details>
+
 
 
 
 #### Now you can start training
 
-* First launch a visdom server :
-
-```bash
+```
+# First launch a visdom server :
 python -m visdom.server -p 8888
 ```
 
-* Launch the training. Check out all the options in ```./training/train_sup.py``` .
-
 ```shell
-export CUDA_VISIBLE_DEVICES=0 #whichever you want
-source activate pytorch-atlasnet
-git pull
-env=3D-CODED
-python ./training/train_sup.py --env $env  |& tee ${env}.txt
+python ./training/train_sup.py
 ```
 
-* Monitor your training on http://localhost:8888/
+<details><summary>* Monitor your training on http://localhost:8888/</summary>
 
 ![visdom](./README/1532524819586.png)
+</details>
 
+
+<details><summary>#### Data  </summary>
+
+
+The generation process of the dataset is quite heavy so we provide our processed data. Should you want to reproduce the preprocessing, go to ```data/README.md```. Brace yourselve :-)
+
+</details>
 
 
 ## Acknowledgement
@@ -190,3 +190,5 @@ If you find this work useful in your research, please consider citing:
 ![visdom](./README/image.png)
 
 [![Analytics](https://ga-beacon.appspot.com/UA-91308638-2/github.com/ThibaultGROUEIX/3D-CODED/readme.md?pixel)](https://github.com/ThibaultGROUEIX/3D-CODED/)
+
+```
