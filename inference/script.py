@@ -1,4 +1,3 @@
-
 from __future__ import print_function
 import sys
 sys.path.append('./auxiliary/')
@@ -7,18 +6,10 @@ sys.path.append('./')
 import my_utils
 print("fixed seed")
 import argparse
-import random
-import numpy as np
-import torch
-import torch.optim as optim
-from datasetSMPL2 import *
-from model import *
-from ply import *
 import os
-import json
 import datetime
 import correspondences
-import parser
+
 parser = argparse.ArgumentParser()
 print(sys.path)
 # ========
@@ -34,6 +25,14 @@ opt.randomize = my_utils.int_2_boolean(opt.randomize)
 my_utils.plant_seeds(randomized_seed=opt.randomize)
 
 
+if not os.path.exists("log_inference"):
+    print("Creating log_inference folder")
+    os.mkdir("log_inference")
+
+if not os.path.exists(os.path.join(opt.dataset_path,"test_scan_006.ply")):
+    print("getting test data")
+    os.system(f"chmod +x ./inference/download_test_data.sh")
+    os.system(f"./inference/download_test_data.sh {opt.dataset_path}")
 #
 # =====DEFINE CHAMFER LOSS======================================== #
 sys.path.append("./extension/")
@@ -52,9 +51,6 @@ if not os.path.exists(dir_name):
 inf = correspondences.Inference(model_path = opt.model_path, save_path=dir_name, LR_input=opt.LR_input)
 
 
-if not os.path.exists("log_inference"):
-    print("Creating log_inference folder")
-    os.mkdir("log_inference")
 
 
 
