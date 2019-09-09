@@ -27,7 +27,9 @@ class SURREAL(data.Dataset):
         self.datas = []
         start = time.time()
         if not os.path.exists("./data/datas_surreal_train.pth"):
-            os.system("chmod +x ./data/download_dataset.sh ; ./data/download_dataset.sh; mv *.pth data/")
+            os.system("chmod +x ./data/download_dataset.sh")
+            os.system("./data/download_dataset.sh")
+            os.system("mv *.pth data/")
 
         if self.train:
             self.datas = torch.load("./data/datas_surreal_train.pth")
