@@ -99,14 +99,14 @@ You need to make sure your meshes are preprocessed correctly :
 ## Training
 
 
-<details><summary Install Pymesh</summary>
+<details><summary> Install Pymesh</summary>
 
 Follow the specific repo instruction [here](https://github.com/qnzhou/PyMesh).
 
 Pymesh is my favorite Geometry Processing Library for Python, it's developed by an Adobe researcher : [Qingnan Zhou](https://research.adobe.com/person/qingnan-zhou/). It can be tricky to set up. Trimesh is good alternative but requires a few code edits in this case.
 
 </details>
-<details><summary Trainer's Options</summary>
+<details><summary> Trainer's Options</summary>
 
 ```python
 '--batchSize', type=int, default=32, help='input batch size'
