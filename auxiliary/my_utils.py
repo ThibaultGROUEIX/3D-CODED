@@ -25,7 +25,7 @@ def test_orientation(input_mesh):
         print("The widest axis is not the Y axis, you should make sure the mesh is aligned on the Y axis for the autoencoder to work (check out the example in /data)")
     return
 
-def clean(input_mesh, prop):
+def clean(input_mesh, prop=None):
     """
     This function remove faces, and vertex that doesn't belong to any face. Intended to be used before a feed forward pass in pointNet
     Input : mesh
@@ -38,11 +38,15 @@ def clean(input_mesh, prop):
     faces = faces.reshape(-1)
     unique_points_index = np.unique(faces)
     unique_points = pts[unique_points_index]
-    new_prop = prop[unique_points_index]
+
     print("number of point after : " , np.shape(unique_points)[0])
     mesh = trimesh.Trimesh(vertices=unique_points, faces=np.array([[0,0,0]]), process=False)
-    return mesh, new_prop
-
+    if prop is not None:
+        new_prop = prop[unique_points_index]
+        return mesh, new_prop
+    else:
+        return mesh
+    
 
 def center(input_mesh):
     """
