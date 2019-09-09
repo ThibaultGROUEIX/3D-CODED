@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!--author : Enterily written by Yana Hasson
+     : https://hassony2.github.io/-->
+  <head>
+   <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+   <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+   <meta content="utf-8" http-equiv="encoding">
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h3 class="text-muted">Parameter monkey</h3>
+      </div>
+​
+      <div>
+          <div id="included"></div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" type="text/javascript"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+          $('#included').load("raw.html",  function() {
+              // Add bottom search fields
+              $('#example').append('<tfoot><tr></tr></tfoot>')
+              $('#example thead th').each( function (i) {
+                  $('#example tfoot tr').append('<th></th>')
+              });
+              $('#example tfoot th').each( function (i) {
+              var title = $('#example thead th').eq( $(this).index() ).text();
+              $(this).html( '<input type="text" placeholder="Search '+title+'" data-index="'+i+'" />' );
+              } );
+              var table = $('#example').DataTable(
+                  {"searching": true,
+                   "paging": false,
+                    });
+            // Filter event handler
+            $( table.table().container() ).on( 'keyup', 'tfoot input', function () {
+               table
+                    .column( $(this).data('index') )
+                    .search( this.value )
+                    .draw();
+            } );
+          });
+      });
+    </script>
+  </body>
+</html>
+    <!--author : Enterily written by Yana Hasson
+     : https://hassony2.github.io/-->
+
+
+<!--html_str = a.to_html(table_id="example").replace("&lt;", "<").replace("&gt;", ">")-->
+<!--with open(os.path.join("html", "raw.html"), "w") as fo:-->
+<!--    fo.write(html_str)-->

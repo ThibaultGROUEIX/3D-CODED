@@ -61,5 +61,9 @@ def job_scheduler(dict_of_jobs):
         os.system(CMD)
 
 
+if not os.path.exists("log_terminals"):
+    print("Creating log_terminals folder")
+    os.mkdir("log_terminals")
+
 job_scheduler(exp.inference)
 # job_scheduler(exp.trainings)

@@ -1,0 +1,12 @@
+log_inference/*
+log_terminals/*
+data/datas_surreal_train.pth
+data/ddatas_surreal_test.pth
+data/example_0.ply
+data/example_0FinalReconstruction.ply
+data/example_0InitialGuess.ply
+data/example_1FinalReconstruction.ply
+TODO
+commit.txt
+export/*
+log/*

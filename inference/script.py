@@ -52,7 +52,9 @@ if not os.path.exists(dir_name):
 inf = correspondences.Inference(model_path = opt.model_path, save_path=dir_name, LR_input=opt.LR_input)
 
 
-
+if not os.path.exists("log_inference"):
+    print("Creating log_inference folder")
+    os.mkdir("log_inference")
 
 
 
