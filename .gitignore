@@ -10,3 +10,7 @@ TODO
 commit.txt
 export/*
 log/*
+.DS_Store
+.idea/
+auxiliary/__pycache__/
+legacy_code/
