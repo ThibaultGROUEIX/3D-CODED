@@ -169,12 +169,14 @@ def add_random_translation(points, scale = 0.03):
 def get_vertex_normalised_area(mesh):
     #input : pymesh mesh
     #output : Numpy array #vertex summing to 1
+    num_vertices = mesh.vertices.shape[0]
+    print("num_vertices", num_vertices)
     a = mesh.vertices[mesh.faces[:, 0]]
     b = mesh.vertices[mesh.faces[:, 1]]
     c = mesh.vertices[mesh.faces[:, 2]]
     cross = np.cross(a - b, a - c)
     area = np.sqrt(np.sum(cross ** 2, axis=1))
-    prop = np.zeros((6890))
+    prop = np.zeros((num_vertices))
     prop[mesh.faces[:, 0]] = prop[mesh.faces[:, 0]] + area
     prop[mesh.faces[:, 1]] = prop[mesh.faces[:, 1]] + area
     prop[mesh.faces[:, 2]] = prop[mesh.faces[:, 2]] + area

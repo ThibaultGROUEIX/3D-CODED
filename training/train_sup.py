@@ -1,19 +1,3 @@
-# TODO Change Dataloader : works -> Add release tag
-# TODO Fix seed
-# TODO add arg_parse file
-# TODO Build trainer class with abstract trainer.
-# TODO add cool new scripts from CycleConsistentCorrespondence
-# TODO add Theo's work as a Flag
-# TODO add superquadrics loss (check how probas are predicted in original paper)
-# TODO add learned gradient descent
-# TODO add nice logging
-# TODO try with larger batchsize while at Adobe
-# TODO : add a class template_point_sampling with a method .sample() to merge atlasnet and 3D-CODED
-# TODO : #TODO : Regress should be in the model
-# TODO : In dataset surreal. Keep only the loading of two large files
-# TODO : try to make things multi-gpu friendly and try it
-# TODO make a download script for mpi, (to be called in script.py), for data_surreal to be called in data_surreal, and for the trained_models.
-
 from __future__ import print_function
 import sys
 sys.path.append('./auxiliary/')
@@ -27,7 +11,7 @@ import random
 import numpy as np
 import torch
 import torch.optim as optim
-from datasetSMPL2 import *
+from dataset import *
 from model import *
 from ply import *
 import os
@@ -42,7 +26,7 @@ parser.add_argument('--workers', type=int, help='number of data loading workers'
 parser.add_argument('--nepoch', type=int, default=100, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='optional reload model path')
 parser.add_argument('--env', type=str, default="3DCODED_supervised", help='visdom environment')
-parser.add_argument('--training_id', type=str, default=None,help='training name')
+parser.add_argument('--id', type=str, default=None,help='training name')
 
 opt = parser.parse_args()
 print(opt)
@@ -59,8 +43,8 @@ distChamfer =  ext.chamferDist()
 vis = visdom.Visdom(port=9000, env=opt.env)
 now = datetime.datetime.now()
 save_path = now.isoformat()
-if opt.training_id is not None:
-    dir_name = os.path.join('log',opt.training_id)
+if opt.id is not None:
+    dir_name = os.path.join('log',opt.id)
 else:
      dir_name = os.path.join('log', save_path)
 if not os.path.exists(dir_name):
@@ -68,7 +52,6 @@ if not os.path.exists(dir_name):
 logname = os.path.join(dir_name, 'log.txt')
 
 blue = lambda x: '\033[94m' + x + '\033[0m'
-
 
 L2curve_train_smpl = []
 L2curve_val_smlp = []
@@ -81,10 +64,10 @@ tmp_val_loss = my_utils.AverageValueMeter()
 
 
 # ===================CREATE DATASET================================= #
-dataset = SMPL(train=True, regular = True)
+dataset = SURREAL(train=True, regular_sampling = True)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,shuffle=True, num_workers=int(opt.workers))
-dataset_smpl_test = SMPL(train=False)
-dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,shuffle=False, num_workers=int(opt.workers))
+dataset_smpl_test = SURREAL(train=False)
+dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=5,shuffle=False, num_workers=int(opt.workers))
 len_dataset = len(dataset)
 # ========================================================== #
 
@@ -119,7 +102,7 @@ for epoch in range(opt.nepoch):
     network.train()
     for i, data in enumerate(dataloader, 0):
         optimizer.zero_grad()
-        points, idx,_ = data
+        points, idx,_ , _= data
         points = points.transpose(2, 1).contiguous()
         points = points.cuda()
         pointsReconstructed = network.forward_idx(points, idx)  # forward pass
@@ -154,7 +137,7 @@ for epoch in range(opt.nepoch):
         network.eval()
         val_loss_L2_smpl.reset()
         for i, data in enumerate(dataloader_smpl_test, 0):
-            points, fn, idx = data
+            points, fn, idx, _ = data
             points = points.transpose(2, 1).contiguous()
             points = points.cuda()
             pointsReconstructed = network(points)  # forward pass

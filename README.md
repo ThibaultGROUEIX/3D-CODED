@@ -1,4 +1,4 @@
-🚀 Major upgrade 🚀 : Migration to  **Pytorch v1** and **Python 3.7**. The code is now much more generic and easy to install. 
+🚀 data release 🚀 : Just run `python training/train_sup.py`
 
 # 3D-CODED : 3D Correspondences by Deep Deformation :page_with_curl:
 
@@ -8,20 +8,6 @@ This repository contains the source codes for the paper [3D-CODED : 3D Correspon
 
 
 <img src="README/mesh8.ply.gif" style="zoom:80%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:80%" />
-
-
-## Citing this work 
-
-If you find this work useful in your research, please consider citing:
-
-```
-@inproceedings{groueix2018b,
-          title = {3D-CODED : 3D Correspondences by Deep Deformation},
-          author={Groueix, Thibault and Fisher, Matthew and Kim, Vladimir G. and Russell, Bryan and Aubry, Mathieu},
-          booktitle = {ECCV},
-          year = 2018}
-        }
-```
 
 ## Project Page 
 
@@ -33,22 +19,13 @@ This implementation uses [Pytorch](http://pytorch.org/).
 
 ```shell
 git clone git@github.com:ThibaultGROUEIX/3D-CODED.git ## Download the repo
-conda create --name pytorch-atlasnet python=3.7 ## Create python env
-source activate pytorch-atlasnet
-pip install pandas visdom trimesh sklearn
-conda install pytorch torchvision -c pytorch # or from sources if you prefer
-# you're done ! Congrats :)
+conda env create -f 3D-CODED-ENV.yml ## Create python env
+source activate pytorch-3D-CODED
+cd ./extension; python setup.py install; cd ..
+pip install http://imagine.enpc.fr/~langloip/data/pymesh2-0.2.1-cp37-cp37m-linux_x86_64.whl
 ```
 
-Tested on 11/18 with  pytorch 0.4.1 (py37_py36_py35_py27__9.0.176_7.1.2_2) and [latest source](
 
-#### Build chamfer distance 
-
-```shell
-source activate pytorch-atlasnet
-cd 3D-CODED/extension
-python setup.py install
-```
 
 ## Using the Trained models :train2:
 
@@ -123,7 +100,7 @@ You need to make sure your meshes are preprocessed correctly :
 
 #### Data  
 
-The dataset can't be shared because of copyrights issues. Since the generation process of the dataset is quite heavy, it has it's own README in ```data/README.md```. Brace yourselve :-)
+The generation process of the dataset is quite heavy so we provide our processed data. Should you want to reproduce the preprocessing, go to ```data/README.md```. Brace yourselve :-)
 
 
 #### Install Pymesh
@@ -167,15 +144,6 @@ python ./training/train_sup.py --env $env  |& tee ${env}.txt
 
 ![visdom](./README/1532524819586.png)
 
-* Timings, results, memory requirements
-
-| Method         | Faust euclidean error in cm | GPU memory | Time by epoch⁽²⁾ |
-| -------------- | --------------------------- | ---------- | ---------------- |
-| train_sup.py   | 2.878                       | TODO       | TODO             |
-| train_unsup.py | 4.883                       | TODO       | TODO             |
-
-⁽²⁾this is only an estimate, the code is not optimised
-
 
 
 ## Acknowledgement
@@ -191,6 +159,23 @@ python ./training/train_sup.py --env $env  |& tee ${env}.txt
 * [Pytorch developpers](https://github.com/pytorch/pytorch) for making DL code so easy.
 * This work was funded by [Ecole Doctorale MSTIC](http://www.univ-paris-est.fr/fr/-ecole-doctorale-mathematiques-et-stic-mstic-ed-532/). Thanks !
 * And last but not least, my great co-authors :  **[Matthew Fisher](http://graphics.stanford.edu/~mdfisher/publications.html), [Vladimir G. Kim](http://vovakim.com/), [Bryan C. Russell](http://bryanrussell.org/), and [Mathieu Aubry](http://imagine.enpc.fr/~aubrym/cv.html)**
+
+
+
+## Citing this work 
+
+If you find this work useful in your research, please consider citing:
+
+```
+@inproceedings{groueix2018b,
+          title = {3D-CODED : 3D Correspondences by Deep Deformation},
+          author={Groueix, Thibault and Fisher, Matthew and Kim, Vladimir G. and Russell, Bryan and Aubry, Mathieu},
+          booktitle = {ECCV},
+          year = 2018}
+        }
+```
+
+## 
 
 ## License
 

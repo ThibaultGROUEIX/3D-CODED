@@ -6,9 +6,11 @@ import torch
 import torch.optim as optim
 import sys
 sys.path.append('./auxiliary/')
-from datasetSMPL2 import *
+from dataset import *
 from model import *
-from utils import *
+import my_utils
+my_utils.plant_seeds(randomized_seed=False)
+
 from ply import *
 import os
 import json
@@ -58,17 +60,17 @@ L2curve_train_smpl = []
 L2curve_val_smpl = []
 
 # meters to record stats on learning
-train_loss_L2_smpl = AverageValueMeter()
-val_loss_L2_smpl = AverageValueMeter()
-tmp_val_loss = AverageValueMeter()
+train_loss_L2_smpl = my_utils.AverageValueMeter()
+val_loss_L2_smpl = my_utils.AverageValueMeter()
+tmp_val_loss = my_utils.AverageValueMeter()
 # ========================================================== #
 
 
 # ===================CREATE DATASET================================= #
-dataset = SMPL(train=True, regular = True)
+dataset = SURREAL(train=True, regular = True)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
                                          shuffle=True, num_workers=int(opt.workers), drop_last=True)
-dataset_smpl_test = SMPL(train=False)
+dataset_smpl_test = SURREAL(train=False)
 dataloader_smpl_test = torch.utils.data.DataLoader(dataset_smpl_test, batch_size=opt.batchSize,
                                          shuffle=False, num_workers=int(opt.workers))
 len_dataset = len(dataset)
@@ -95,7 +97,7 @@ laplaceloss = LaplacianLoss(faces, vertices, toref)
 
 laplaceloss(vertices)
 network.cuda()  # put network on GPU
-network.apply(weights_init)  # initialization of the weight
+network.apply(my_utils.weights_init)  # initialization of the weight
 if opt.model != '':
     network.load_state_dict(torch.load(opt.model))
     print(" Previous weight loaded ")

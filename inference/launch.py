@@ -8,18 +8,22 @@ import time
 class Experiments(object):
     def __init__(self):
         self.inference = {
-            0: "python inference/script.py --id 0 --randomize 0 --LR_input 1",
-            1: "python inference/script.py --id 1 --randomize 0 --LR_input 0",
-            2: "python inference/script.py --id 2 --randomize 1 --LR_input 1",
-            3: "python inference/script.py --id 3 --randomize 1 --LR_input 1",
-            4: "python inference/script.py --id 4 --randomize 1 --LR_input 1",
-            5: "python inference/script.py --id 5 --randomize 1 --LR_input 1",
-            6: "python inference/script.py --id 6 --randomize 1 --LR_input 1",
-            7: "python inference/script.py --id 7 --randomize 1 --LR_input 1",
-            8: "python inference/script.py --id 8 --randomize 1 --LR_input 1",
-            9: "python inference/script.py --id 9 --randomize 1 --LR_input 1",
+            # 0: "python inference/script.py --id 0 --randomize 0 --LR_input 0 --model_path ./log/2019-09-05T21:21:12.069673/network_last.pth",
+            # 1: "python inference/script.py --id 1 --randomize 0 --LR_input 0 --model_path ./log/2019-09-05T21:23:32.544225/network_last.pth",
+            # 2: "python inference/script.py --id 2 --randomize 0 --LR_input 0 --model_path ./log/2019-09-05T22:46:04.314684/network_last.pth",
+            3: "python inference/script.py --id 3 --randomize 0 --LR_input 0",
+            # 4: "python inference/script.py --id 4 --randomize 1 --LR_input 1",
+            # 5: "python inference/script.py --id 5 --randomize 1 --LR_input 1",
+            # 6: "python inference/script.py --id 6 --randomize 1 --LR_input 1",
+            # 7: "python inference/script.py --id 7 --randomize 1 --LR_input 1",
+            # 8: "python inference/script.py --id 8 --randomize 1 --LR_input 1",
+            # 9: "python inference/script.py --id 9 --randomize 1 --LR_input 1",
         }
-
+        self.trainings = {
+            0: "python training/train_sup_2.py --id 0",
+            1: "python training/train_sup_2.py --id 1",
+            2: "python training/train_sup_2.py --id 2",
+        }
 
 exp = Experiments()
 
@@ -58,3 +62,4 @@ def job_scheduler(dict_of_jobs):
 
 
 job_scheduler(exp.inference)
+# job_scheduler(exp.trainings)

@@ -8,6 +8,7 @@ import numpy as np
 import torch.nn.functional as F
 from my_utils import sampleSphere
 import trimesh
+import pointcloud_processor
 
 #UTILITIES
 class STN3d(nn.Module):
@@ -136,6 +137,9 @@ class AE_AtlasNet_Humans(nn.Module):
         self.vertex_HR = torch.from_numpy(point_set_HR).cuda().float()
         self.num_vertex = self.vertex.size(0)
         self.num_vertex_HR = self.vertex_HR.size(0)
+        self.prop = pointcloud_processor.get_vertex_normalised_area(mesh)
+        assert (np.abs(np.sum(self.prop) - 1) < 0.001), "Propabilities do not sum to 1!)"
+        self.prop = torch.from_numpy(self.prop).cuda().unsqueeze(0).float()
 
     def forward2(self, x):
         x = self.encoder(x)

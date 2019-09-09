@@ -26,7 +26,7 @@ parser.add_argument('--model_path', type=str, default = 'trained_models/sup_huma
 parser.add_argument('--dataset_path', type=str, default = './export/',  help='your path to the trained model')
 parser.add_argument('--id', type=str, default = '1',  help='your path to the trained model')
 parser.add_argument('--LR_input', type=int, default=1, help='Use high Resolution template for better precision in the nearest neighbor step ?')
-parser.add_argument('--randomize', type=int, default=0, help='if 1, projects predicted correspondences point on target mesh')
+parser.add_argument('--randomize', type=int, default=0)
 
 opt = parser.parse_args()
 opt.LR_input = my_utils.int_2_boolean(opt.LR_input)
