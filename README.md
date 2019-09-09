@@ -39,7 +39,7 @@ python inference/correspondences.py
 ```
 This script takes as input 2 meshes from ```data``` and compute correspondences in ```results```. Reconstruction are saved in ```data```.
 
-<details><summary><-- More details here</summary>
+<details><summary>More details here</summary>
   
 
 It should look like :
@@ -99,14 +99,14 @@ You need to make sure your meshes are preprocessed correctly :
 ## Training
 
 
-<details><summary>#### Install Pymesh</summary>
+<details><summary Install Pymesh</summary>
 
 Follow the specific repo instruction [here](https://github.com/qnzhou/PyMesh).
 
 Pymesh is my favorite Geometry Processing Library for Python, it's developed by an Adobe researcher : [Qingnan Zhou](https://research.adobe.com/person/qingnan-zhou/). It can be tricky to set up. Trimesh is good alternative but requires a few code edits in this case.
 
 </details>
-<details><summary>#### Options</summary>
+<details><summary Trainer's Options</summary>
 
 ```python
 '--batchSize', type=int, default=32, help='input batch size'
@@ -132,13 +132,13 @@ python -m visdom.server -p 8888
 python ./training/train_sup.py
 ```
 
-<details><summary>* Monitor your training on http://localhost:8888/</summary>
+<details><summary> Monitor your training on http://localhost:8888/</summary>
 
 ![visdom](./README/1532524819586.png)
 </details>
 
 
-<details><summary>#### Data  </summary>
+<details><summary> Note on data preprocessing  </summary>
 
 
 The generation process of the dataset is quite heavy so we provide our processed data. Should you want to reproduce the preprocessing, go to ```data/README.md```. Brace yourselve :-)
