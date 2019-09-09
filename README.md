@@ -27,22 +27,20 @@ pip install http://imagine.enpc.fr/~langloip/data/pymesh2-0.2.1-cp37-cp37m-linux
 
 
 
-## Using the Trained models :train2:
+## Demo :train2:
 
-The trained models and some corresponding results are also available online :
 
-- [The trained_models](https://cloud.enpc.fr/s/n4L7jqD486V8IJn) go in ``` trained_models/```
-
-#### On the demo meshes 
-
-Require 3 GB of RAM on the GPU and 17 sec to run (Titan X Pascal). 
 
 ```shell
+#Require 3 GB of RAM on the GPU and 17 sec to run (Titan X Pascal). 
 cd trained_models; ./download_models.sh; cd .. # download the trained models
 cd data; ./download_template.sh; cd .. # download the template
 python inference/correspondences.py
 ```
-This script takes as input 2 meshes from ```data``` and compute correspondences in ```results```. Reconstruction are saved in ```data```
+This script takes as input 2 meshes from ```data``` and compute correspondences in ```results```. Reconstruction are saved in ```data```.
+
+<details><summary><-- More details here</summary>
+  
 
 It should look like :
 
@@ -83,8 +81,6 @@ You need to make sure your meshes are preprocessed correctly :
 
 ```
 
-
-
 #### Failure modes instruction : :warning:
 
 - Sometimes the reconstruction is flipped, which break the correspondences. In the easiest case where you meshes are registered in the same orientation, you can just fix this angle in ```reconstruct.py``` line 86, to avoid the flipping problem. Also note from this line that the angle search only looks in [-90°,+90°].
@@ -95,6 +91,10 @@ You need to make sure your meshes are preprocessed correctly :
 #### Last comments
 
 * If you want to use ```inference/correspondences.py``` to process a hole dataset, like FAUST test set, make sure you don't load the same network in memory every time you compute correspondences between two meshes (which will happen with the naive and simplest way of doing it by calling ```inference/correspondences.py``` iteratively on all the pairs). A example of bad practice is in ```./auxiliary/script.sh```, for the FAUST inter challenge. **Good luck :-)**
+
+</details>
+
+
 
 ## Training the autoencoder
 
