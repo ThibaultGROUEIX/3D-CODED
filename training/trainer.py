@@ -10,19 +10,24 @@ import loss
 from abstract_trainer import AbstractTrainer
 import os
 
+
 class Trainer(AbstractTrainer):
     def __init__(self, opt):
         super().__init__(opt)
         self.git_repo_path = "https://github.com/ThibaultGROUEIX/3D-CODED/commit/"
         self.init_save_dict(opt)
 
-
     def build_network(self):
         """
         Create network architecture. Refer to auxiliary.model
         :return:
         """
-        network = model.AE_AtlasNet_Humans(point_translation=self.opt.point_translation, dim_template=self.opt.dim_template, patch_deformation=self.opt.patch_deformation, dim_out_patch=self.opt.dim_out_patch, nb_primitives=self.opt.nb_primitives)
+        network = model.AE_AtlasNet_Humans(point_translation=self.opt.point_translation,
+                                           dim_template=self.opt.dim_template,
+                                           patch_deformation=self.opt.patch_deformation,
+                                           dim_out_patch=self.opt.dim_out_patch, nb_primitives=self.opt.nb_primitives,
+                                           start_from=self.opt.start_from, dataset_train=self.dataset_train,
+                                           primitive_selection=self.opt.primitive_selection)
         network.cuda()  # put network on GPU
         network.apply(my_utils.weights_init)  # initialization of the weight
         if self.opt.model != "":
@@ -30,7 +35,7 @@ class Trainer(AbstractTrainer):
                 network.load_state_dict(torch.load(self.opt.model))
                 print(" Previous network weights loaded! From ", self.opt.model)
             except:
-                print("Failed to reload " , self.opt.model)
+                print("Failed to reload ", self.opt.model)
         if self.opt.reload:
             print(f"reload model frow :  {self.opt.dir_name}")
             self.opt.model = os.path.join(self.opt.dir_name, "network.pth")
@@ -50,12 +55,11 @@ class Trainer(AbstractTrainer):
         """
         Create training dataset
         """
-        self.dataset_train = dataset.SURREAL(train=True, regular_sampling = True)
+        self.dataset_train = dataset.SURREAL(train=True, regular_sampling=True)
         self.dataloader_train = torch.utils.data.DataLoader(self.dataset_train, batch_size=self.opt.batch_size,
                                                             shuffle=True, num_workers=int(self.opt.workers),
                                                             drop_last=True)
         self.len_dataset = len(self.dataset_train)
-
 
     def build_dataset_test(self):
         """
@@ -67,22 +71,18 @@ class Trainer(AbstractTrainer):
                                                            drop_last=True)
         self.len_dataset_test = len(self.dataset_test)
 
-
     def build_losses(self):
         """
         Create losses
         """
         self.distChamfer = get_chamfer.get(self.opt)
 
-
-
-
     def train_iteration(self):
         self.optimizer.zero_grad()
 
         pointsReconstructed = self.network(self.points, self.idx)  # forward pass
         loss_train_total = torch.mean(
-                (pointsReconstructed - self.points.transpose(2, 1).contiguous()) ** 2)
+            (pointsReconstructed - self.points.transpose(2, 1).contiguous()) ** 2)
         loss_train_total.backward()
 
         self.log.update("loss_train_total", loss_train_total)
@@ -92,10 +92,10 @@ class Trainer(AbstractTrainer):
         if self.iteration % 100 == 1 and self.opt.display:
             self.visualizer.show_pointclouds(points=self.points[0], title="train_input")
             self.visualizer.show_pointclouds(points=pointsReconstructed[0], title="train_input_reconstructed")
-            if self.opt.dim_template==3:
+            if self.opt.dim_template == 3:
                 for i in range(self.opt.nb_primitives):
                     self.visualizer.show_pointclouds(points=self.network.template[i].vertex, title=f"template{i}")
-            if self.opt.patch_deformation and self.opt.dim_out_patch==3:
+            if self.opt.patch_deformation and self.opt.dim_out_patch == 3:
                 template = self.network.get_patch_deformation_template()
                 for i in range(self.opt.nb_primitives):
                     self.visualizer.show_pointclouds(points=template[i], title=f"template_deformed{i}")
@@ -113,10 +113,10 @@ class Trainer(AbstractTrainer):
             try:
                 # if self.iteration > 10:
                 #     break
-                points, idx,_ , _ = iterator.next()
+                points, idx, _, _ = iterator.next()
                 points = points.transpose(2, 1).contiguous()
                 points = points.cuda()
-                self.points= points
+                self.points = points
                 self.idx = idx
                 self.increment_iteration()
             except:
@@ -128,7 +128,7 @@ class Trainer(AbstractTrainer):
     def test_iteration(self):
         pointsReconstructed = self.network(self.points)
         loss_val_Deformation_ChamferL2 = torch.mean(
-                (pointsReconstructed - self.points.transpose(2, 1).contiguous()) ** 2)
+            (pointsReconstructed - self.points.transpose(2, 1).contiguous()) ** 2)
 
         self.log.update("loss_val_Deformation_ChamferL2", loss_val_Deformation_ChamferL2)
         print(
@@ -141,8 +141,6 @@ class Trainer(AbstractTrainer):
             self.visualizer.show_pointclouds(points=self.points[0], title="test_input")
             self.visualizer.show_pointclouds(points=pointsReconstructed[0], title="test_input_reconstructed")
 
-
-
     def test_epoch(self):
         self.network.eval()
         iterator = self.dataloader_test.__iter__()
@@ -150,10 +148,10 @@ class Trainer(AbstractTrainer):
         while True:
             self.increment_iteration()
             try:
-                points, _,_ , _ = iterator.next()
+                points, _, _, _ = iterator.next()
                 points = points.transpose(2, 1).contiguous()
                 points = points.cuda()
-                self.points= points
+                self.points = points
             except:
                 print(colored("end of val dataset", 'red'))
                 break
