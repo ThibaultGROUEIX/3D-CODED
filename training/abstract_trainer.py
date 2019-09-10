@@ -84,12 +84,13 @@ class AbstractTrainer(object):
             os.mkdir(self.opt.dir_name)
 
         self.opt.logname = os.path.join(self.opt.dir_name, "log.txt")
-        self.opt.checkpointname = os.path.join(self.opt.dir_name, 'checkpointname.txt')
+        self.opt.checkpointname = os.path.join(self.opt.dir_name, 'optimizer_last.pth')
 
         # # If a network is already created in th
         self.opt.reload = False
         if os.path.exists(os.path.join(self.opt.dir_name, "network.pth")):
-            self.opt.reload == True
+            print("Going to reload experiment")
+            self.opt.reload = True
 
     def init_meters(self):
         self.log = meter.Logs()
@@ -148,6 +149,11 @@ class AbstractTrainer(object):
         with open(self.opt.logname, "a") as f:  # open and append
             f.write("json_stats: " + json.dumps(log_table) + "\n")
         self.local_dict_to_save_experiment.update(self.log.current_epoch)
+
+        self.opt.start_epoch = self.epoch
+        with open(os.path.join(self.opt.dir_name, "options.json"), "w") as f:  # open and append
+            f.write(json.dumps(self.opt.__dict__))
+
 
     def print_iteration_stats(self, loss):
         """

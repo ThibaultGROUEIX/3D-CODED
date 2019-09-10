@@ -2,7 +2,8 @@ import argparse
 import auxiliary.my_utils as my_utils
 import os
 import datetime
-
+import json
+from termcolor import colored
 
 def Args2String(opt):
     my_str = ""
@@ -22,7 +23,7 @@ def parser():
     parser = argparse.ArgumentParser()
     # Training parameters
     parser.add_argument('--batch_size', type=int, default=32, help='input batch size')
-    parser.add_argument('--workers', type=int, help='number of data loading workers', default=8)
+    parser.add_argument('--workers', type=int, help='number of data loading workers', default=10)
     parser.add_argument('--nepoch', type=int, default=100, help='number of epochs to train for')
     parser.add_argument('--start_epoch', type=int, default=0, help='number of epochs to train for')
     parser.add_argument('--randomize', type=int, default=0, help='if 1, projects predicted correspondences point on target mesh')
@@ -39,9 +40,16 @@ def parser():
     parser.add_argument('--display', type=int, default=1, help='visdom environment')
     parser.add_argument('--port', type=int, default=8889, help='visdom port')
     parser.add_argument('--dir_name', type=str, default="",  help='dirname')
+    parser.add_argument('--dataset_path', type=str, default = './export/',  help='your path to the trained model')
 
     # Network
     parser.add_argument('--model', type=str, default='', help='optional reload model path')
+    parser.add_argument('--nb_primitives', type=int, default=1, help='number of primitives')
+    parser.add_argument('--point_translation', type=int, default=0, help='point_translation')
+    parser.add_argument('--dim_template', type=int, default=3, help='dim_template')
+    parser.add_argument('--patch_deformation', type=int, default=0, help='patch_deformation')
+    parser.add_argument('--dim_out_patch', type=int, default=3, help='dim_out_patch')
+
 
     # Loss
     parser.add_argument(
@@ -73,13 +81,29 @@ def parser():
     opt.randomize = my_utils.int_2_boolean(opt.randomize)
     opt.accelerated_chamfer = my_utils.int_2_boolean(opt.accelerated_chamfer)
     opt.display = my_utils.int_2_boolean(opt.display)
+    opt.point_translation = my_utils.int_2_boolean(opt.point_translation)
+    opt.patch_deformation = my_utils.int_2_boolean(opt.patch_deformation)
 
     opt.date = str(datetime.datetime.now())
     now = datetime.datetime.now()
     if opt.dir_name=="":
         opt.dir_name = os.path.join('log', opt.id + now.isoformat())
-
-
-    # my_utils.print_arg(opt)
-
+    else:
+        print("Modifying input arguments to match network in dirname")
+        with open(os.path.join(opt.dir_name, "options.json"), 'r') as f:
+            my_opt_dict = json.load(f)
+        opt.nb_primitives = my_opt_dict["nb_primitives"]
+        opt.point_translation = my_opt_dict["point_translation"]
+        opt.dim_template = my_opt_dict["dim_template"]
+        opt.patch_deformation = my_opt_dict["patch_deformation"]
+        opt.dim_out_patch = my_opt_dict["dim_out_patch"]
+        opt.start_epoch = my_opt_dict["start_epoch"]
+        my_utils.cyan_print("PARAMETER: ")
+        for a in my_opt_dict:
+            print(
+                "         "
+                + colored(a, "yellow")
+                + " : "
+                + colored(str(my_opt_dict[a]), "cyan")
+            )
     return opt

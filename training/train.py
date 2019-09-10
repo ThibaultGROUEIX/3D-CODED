@@ -1,11 +1,12 @@
 import sys
-
 sys.path.append("./auxiliary/")
+sys.path.append("./inference/")
 sys.path.append("./extension/")
 sys.path.append('/app/python/')
 
 import argument_parser
 import my_utils
+import script
 
 opt = argument_parser.parser()
 my_utils.plant_seeds(randomized_seed=opt.randomize)
@@ -27,3 +28,4 @@ for epoch in range(opt.nepoch):
     trainer.increment_epoch()
 
 trainer.save_new_experiments_results()
+script.main(opt) #Inference

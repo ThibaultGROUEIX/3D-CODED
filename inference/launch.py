@@ -20,9 +20,10 @@ class Experiments(object):
             # 9: "python inference/script.py --id 9 --randomize 1 --LR_input 1",
         }
         self.trainings = {
-            0: "python training/train_sup_2.py --id 0",
-            1: "python training/train_sup_2.py --id 1",
-            2: "python training/train_sup_2.py --id 2",
+            0: "python training/train.py --id 0 --point_translation 1 --patch_deformation 0",
+            1: "python training/train.py --id 1 --point_translation 0 --patch_deformation 1",
+            2: "python training/train.py --id 2 --point_translation 0 --patch_deformation 0",
+            3: "python training/train.py --id 3 --point_translation 1 --patch_deformation 1",
         }
 
 exp = Experiments()
@@ -65,5 +66,5 @@ if not os.path.exists("log_terminals"):
     print("Creating log_terminals folder")
     os.mkdir("log_terminals")
 
-job_scheduler(exp.inference)
-# job_scheduler(exp.trainings)
+# job_scheduler(exp.inference)
+job_scheduler(exp.trainings)

@@ -22,7 +22,7 @@ class Trainer(AbstractTrainer):
         Create network architecture. Refer to auxiliary.model
         :return:
         """
-        network = model.AE_AtlasNet_Humans()
+        network = model.AE_AtlasNet_Humans(point_translation=self.opt.point_translation, dim_template=self.opt.dim_template, patch_deformation=self.opt.patch_deformation, dim_out_patch=self.opt.dim_out_patch, nb_primitives=self.opt.nb_primitives)
         network.cuda()  # put network on GPU
         network.apply(my_utils.weights_init)  # initialization of the weight
         if self.opt.model != "":
@@ -80,7 +80,7 @@ class Trainer(AbstractTrainer):
     def train_iteration(self):
         self.optimizer.zero_grad()
 
-        pointsReconstructed = self.network.forward_idx(self.points, self.idx)  # forward pass
+        pointsReconstructed = self.network(self.points, self.idx)  # forward pass
         loss_train_total = torch.mean(
                 (pointsReconstructed - self.points.transpose(2, 1).contiguous()) ** 2)
         loss_train_total.backward()
@@ -92,6 +92,13 @@ class Trainer(AbstractTrainer):
         if self.iteration % 100 == 1 and self.opt.display:
             self.visualizer.show_pointclouds(points=self.points[0], title="train_input")
             self.visualizer.show_pointclouds(points=pointsReconstructed[0], title="train_input_reconstructed")
+            if self.opt.dim_template==3:
+                for i in range(self.opt.nb_primitives):
+                    self.visualizer.show_pointclouds(points=self.network.template[i].vertex, title=f"template{i}")
+            if self.opt.patch_deformation and self.opt.dim_out_patch==3:
+                template = self.network.get_patch_deformation_template()
+                for i in range(self.opt.nb_primitives):
+                    self.visualizer.show_pointclouds(points=template[i], title=f"template_deformed{i}")
 
         self.print_iteration_stats(loss_train_total)
 
@@ -104,8 +111,8 @@ class Trainer(AbstractTrainer):
         self.reset_iteration()
         while True:
             try:
-                if self.iteration > 10:
-                    break
+                # if self.iteration > 10:
+                #     break
                 points, idx,_ , _ = iterator.next()
                 points = points.transpose(2, 1).contiguous()
                 points = points.cuda()
@@ -155,4 +162,4 @@ class Trainer(AbstractTrainer):
         self.log.end_epoch()
         if self.opt.display:
             self.log.update_curves(self.visualizer.vis, self.opt.dir_name)
-
+            self.network.save_template_png(self.opt.dir_name)
