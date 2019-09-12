@@ -8,10 +8,24 @@ In [ECCV, 2018](http://openaccess.thecvf.com/ECCV2018.py).
  **Learning elementary structures for 3D shape generation and matching** <br>Theo Deprelle, Thibault Groueix,  Matthew Fisher, Vladimir G. Kim , Bryan C. Russell, Mathieu Aubry  <br>
 In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 
-<details><summary>Learned templates</summary>
+<details open><summary>Learned templates</summary>
 
 
 ![image-20190912160913089](./README/learned_templates.png)
+
+<details><summary>Faust results</summary>
+
+
+| Method | Faust Inter results |
+| ------------------------------------------ | ----- |
+| **3D-CODED**                               | 3.047 |
+| **Points Translation**                      | 2.971 |
+| **Patch Deformation**                                   | 2.788 |
+|  **Points Translation + Patch Deformation** |  3.052     |
+
+</details>
+
+
 
 </details>
 
@@ -210,5 +224,5 @@ If you find this work useful in your research, please consider citing:
 - **[Hiroharu Kato](http://hiroharu-kato.com/projects_en/neural_renderer.html)** for his very clean neural renderer code, that I used for the gifs :-)
 - [Pytorch developpers](https://github.com/pytorch/pytorch) for making DL code so easy.
 - This work was funded by [Ecole Doctorale MSTIC](http://www.univ-paris-est.fr/fr/-ecole-doctorale-mathematiques-et-stic-mstic-ed-532/). Thanks !
-- And last but not least, my great co-authors :  **[Matthew Fisher](http://graphics.stanford.edu/~mdfisher/publications.html), [Vladimir G. Kim](http://vovakim.com/), [Bryan C. Russell](http://bryanrussell.org/), and [Mathieu Aubry](http://imagine.enpc.fr/~aubrym/cv.html)**
+- And last but not least, my great co-authors : **[Theo Deprelle](http://imagine.enpc.fr/~deprellt/)**,  **[Matthew Fisher](http://graphics.stanford.edu/~mdfisher/publications.html), [Vladimir G. Kim](http://vovakim.com/), [Bryan C. Russell](http://bryanrussell.org/), and [Mathieu Aubry](http://imagine.enpc.fr/~aubrym/cv.html)**
 
