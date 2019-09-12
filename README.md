@@ -11,12 +11,18 @@ In [ECCV, 2018](http://openaccess.thecvf.com/ECCV2018.py).
  **Learning elementary structures for 3D shape generation and matching** <br>Theo Deprelle, Thibault Groueix,  Matthew Fisher, Vladimir G. Kim , Bryan C. Russell, Mathieu Aubry  <br>
 In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 
-Input : 2 meshes
+<details><summary>Learned templates</summary>
+
+</details>
+<details><summary>Sample results</summary>
+Input : 2 meshes<br>
 Task : put them in point-wise correspondence. (suggested by color)
 
 <img src="README/mesh25.ply.gif" style="zoom:80%" /><img src="README/25RecBestRotReg.ply.gif" style="zoom:80%" />
 
 <img src="README/mesh8.ply.gif" style="zoom:80%" /><img src="README/8RecBestRotReg.ply.gif" style="zoom:80%" />
+</details>
+
 
 ## Install :construction_worker:
 
@@ -40,9 +46,8 @@ python inference/correspondences.py --dir_name learning_elementary_structure_tra
 ```
 This script takes as input 2 meshes from ```data``` and compute correspondences in ```results```. Reconstruction are saved in ```dir_name```.
 
-<details><summary>More details here</summary>
+<details><summary>Options  (Usually default parameters are good)</summary>
 
-#### Options  (Usually default parameters are good)
 
 ```python
 # Key parameters
@@ -62,8 +67,10 @@ This script takes as input 2 meshes from ```data``` and compute correspondences 
 '--randomize', type=int, default=0, help='if 1, projects predicted correspondences point on target mesh'
 '--LR_input', type=int, default=1, help='Use Low Resolution Input '
 ```
+</details>
 
-It should look like :
+<details><summary>Results  </summary>
+
 
 * **Initial guesses** for *example0* and *example1*:
 
@@ -73,8 +80,9 @@ It should look like :
 
 <img src="README/example_0FinalReconstruction.ply.gif" style="zoom:80%" /><img src="README/example_1FinalReconstruction.ply.gif" style="zoom:80%" />
 
+</details>
 
-#### On your own meshes
+<details><summary>On your own meshes  </summary>
 
 You need to make sure your meshes are preprocessed correctly :
 
@@ -87,14 +95,15 @@ You need to make sure your meshes are preprocessed correctly :
 
 
 
-#### Failure modes instruction : :warning:
+--> Failure modes instruction : :warning:
 
 - Sometimes the reconstruction is flipped, which break the correspondences. In the easiest case where you meshes are registered in the same orientation, you can just fix this angle in ```reconstruct.py``` line 86, to avoid the flipping problem. Also note from this line that the angle search only looks in [-90°,+90°].
 
 - Check the presence of lonely outliers that break the Pointnet encoder. You could try to remove them with the ```--clean``` flag.
 
+</details>
 
-#### Last comments
+<details><summary>FAUST </summary>
 
 * If you want to use ```inference/correspondences.py``` to process a hole dataset, like FAUST test set, you can use ```./inference/script.py```, for the FAUST inter challenge. **Good luck :-)**
 
