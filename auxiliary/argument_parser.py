@@ -33,6 +33,7 @@ def parser():
 
     # Data
     parser.add_argument('--number_points', type=int, default=2500, help='Number of point sampled on the object')
+    parser.add_argument('--faust', type=str, default="INTER", choices=["INTER", "INTRA"], help='Faust eval')
 
     # Save dirs and reload
     parser.add_argument('--id', type=str, default="0",help='training name')
