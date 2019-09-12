@@ -146,9 +146,10 @@ python ./training/train_sup.py
 </details>
 
 <details><summary> Monitor your training on http://localhost:8888/</summary>
-![visdom](./README/1532524819586.png)
-</details>
 
+![visdom](./README/1532524819586.png)
+
+</details>
 
 <details><summary> Note on data preprocessing  </summary>
 
