@@ -1,6 +1,3 @@
-
-🚀news 🚀 : (1) [Learning Elementary Structure](http://imagine.enpc.fr/~deprellt/atlasnet2/) release (2) data release
-
 # **3D-CODED** [[Project Page]](http://imagine.enpc.fr/~groueixt/3D-CODED/index.html) [[Paper]](https://arxiv.org/abs/1806.05228) [[Talk]](http://imagine.enpc.fr/~groueixt/3D-CODED/ECCV_6Dpose_Workshop_Groueix.pptx) + **Learning Elementary Structure** [[Project Page]](http://imagine.enpc.fr/~deprellt/atlasnet2/) [[Paper]](https://arxiv.org/abs/1908.04725) [[Code]](https://github.com/TheoDEPRELLE/AtlasNetV2)
 
 
@@ -24,7 +21,7 @@ Task : put them in point-wise correspondence. (suggested by color)
 </details>
 
 
-## Install :construction_worker:
+## Install :construction_worker: [[Pytorch](http://pytorch.org/), Conda]
 
 This implementation uses [Pytorch](http://pytorch.org/). 
 
