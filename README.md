@@ -10,7 +10,11 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 
 <details><summary>Learned templates</summary>
 
+
+![image-20190912160913089](./README/learned_templates.png)
+
 </details>
+
 <details><summary>Sample results</summary>
 Input : 2 meshes<br>
 Task : put them in point-wise correspondence. (suggested by color)
