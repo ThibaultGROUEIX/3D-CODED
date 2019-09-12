@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 sys.path.append('./auxiliary/')
+sys.path.append('./training/')
 sys.path.append('/app/python/')
 sys.path.append('./')
 import my_utils
@@ -10,14 +11,13 @@ import datetime
 import correspondences
 
 
-def main(opt):
+def main(opt, network):
 
     if not os.path.exists(os.path.join(opt.dataset_path,"test_scan_006.ply")):
-        print("getting test data")
-        os.system(f"chmod +x ./inference/download_test_data.sh")
-        os.system(f"./inference/download_test_data.sh {opt.dataset_path}")
+        print("please download test data from http://faust.is.tue.mpg.de/")
+        os.exit()
 
-    if opt.dirname == "":
+    if opt.dir_name == "":
         now = datetime.datetime.now()
         save_path = now.isoformat()
         save_path = opt.id + save_path
@@ -30,7 +30,11 @@ def main(opt):
     else:
         opt.model_path = f"{opt.dir_name}/network.pth"
 
-    inf = correspondences.Inference(model_path = opt.model_path, save_path=dir_name, LR_input=opt.LR_input)
+    network.save_template_png(opt.dir_name)
+    if opt.point_translation:
+        network.make_high_res_template_from_low_res()
+    inf = correspondences.Inference(model_path = opt.model_path, save_path=opt.dir_name, LR_input=opt.LR_input, network=network, HR=opt.HR, reg_num_steps=opt.reg_num_steps)
+
 
     inf.forward(inputA=os.path.join(opt.dataset_path,"test_scan_006.ply"), inputB=os.path.join(opt.dataset_path,"test_scan_021.ply"), path = "006_021.txt")
     inf.forward(inputA=os.path.join(opt.dataset_path,"test_scan_011.ply"), inputB=os.path.join(opt.dataset_path,"test_scan_107.ply"), path = "011_107.txt")
@@ -72,22 +76,17 @@ def main(opt):
     inf.forward(inputA=os.path.join(opt.dataset_path,"test_scan_167.ply"), inputB=os.path.join(opt.dataset_path,"test_scan_044.ply"), path = "167_044.txt")
     inf.forward(inputA=os.path.join(opt.dataset_path,"test_scan_178.ply"), inputB=os.path.join(opt.dataset_path,"test_scan_180.ply"), path = "178_180.txt")
     inf.forward(inputA=os.path.join(opt.dataset_path,"test_scan_198.ply"), inputB=os.path.join(opt.dataset_path,"test_scan_029.ply"), path = "198_029.txt")
-    os.system(f"cd {dir_name}; zip -r base{opt.id}.zip *_*.txt")
+    os.system(f"cd {opt.dir_name}; zip -r base.zip *_*.txt")
     # os.system(f"cd {dir_name}; zip -r base{opt.id}.zip *_*.txt ; cd ../../; rm -r {dir_name}")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    print(sys.path)
-    # ========
-    parser.add_argument('--model_path', type=str, default = 'trained_models/sup_human_network_last.pth',  help='your path to the trained model')
-    parser.add_argument('--dataset_path', type=str, default = './export/',  help='your path to the trained model')
-    parser.add_argument('--id', type=str, default = '1',  help='your path to the trained model')
-    parser.add_argument('--LR_input', type=int, default=1, help='Use high Resolution template for better precision in the nearest neighbor step ?')
-    parser.add_argument('--randomize', type=int, default=0)
-    parser.add_argument('--dir_name', type=str, default="")
+    import argument_parser
 
-    opt = parser.parse_args()
-    opt.LR_input = my_utils.int_2_boolean(opt.LR_input)
-    opt.randomize = my_utils.int_2_boolean(opt.randomize)
+    opt = argument_parser.parser()
     my_utils.plant_seeds(randomized_seed=opt.randomize)
-    main(opt)
+
+    import trainer
+
+    trainer = trainer.Trainer(opt)
+    trainer.build_network()
+    main(opt, trainer.network)

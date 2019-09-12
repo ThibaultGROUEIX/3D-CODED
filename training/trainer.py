@@ -6,16 +6,15 @@ import model
 import extension.get_chamfer as get_chamfer
 import dataset
 from termcolor import colored
-import loss
 from abstract_trainer import AbstractTrainer
 import os
-
 
 class Trainer(AbstractTrainer):
     def __init__(self, opt):
         super().__init__(opt)
         self.git_repo_path = "https://github.com/ThibaultGROUEIX/3D-CODED/commit/"
         self.init_save_dict(opt)
+        self.dataset_train = None
 
     def build_network(self):
         """
@@ -25,9 +24,8 @@ class Trainer(AbstractTrainer):
         network = model.AE_AtlasNet_Humans(point_translation=self.opt.point_translation,
                                            dim_template=self.opt.dim_template,
                                            patch_deformation=self.opt.patch_deformation,
-                                           dim_out_patch=self.opt.dim_out_patch, nb_primitives=self.opt.nb_primitives,
-                                           start_from=self.opt.start_from, dataset_train=self.dataset_train,
-                                           primitive_selection=self.opt.primitive_selection)
+                                           dim_out_patch=self.opt.dim_out_patch,
+                                           start_from=self.opt.start_from, dataset_train=self.dataset_train)
         network.cuda()  # put network on GPU
         network.apply(my_utils.weights_init)  # initialization of the weight
         if self.opt.model != "":
@@ -37,8 +35,9 @@ class Trainer(AbstractTrainer):
             except:
                 print("Failed to reload ", self.opt.model)
         if self.opt.reload:
-            print(f"reload model frow :  {self.opt.dir_name}")
+            print(f"reload model frow :  {self.opt.dir_name}/network.pth")
             self.opt.model = os.path.join(self.opt.dir_name, "network.pth")
+            network.load_state_dict(torch.load(self.opt.model))
 
         self.network = network
 
@@ -80,27 +79,32 @@ class Trainer(AbstractTrainer):
     def train_iteration(self):
         self.optimizer.zero_grad()
 
-        pointsReconstructed = self.network(self.points, self.idx)  # forward pass
+        pointsReconstructed = self.network(self.points, self.idx)  # forward pass # batch, num_point, 3
         loss_train_total = torch.mean(
-            (pointsReconstructed - self.points.transpose(2, 1).contiguous()) ** 2)
+                (pointsReconstructed.view(self.points.size(0), -1, 3) - self.points.transpose(2, 1).contiguous()) ** 2)
         loss_train_total.backward()
 
         self.log.update("loss_train_total", loss_train_total)
         self.optimizer.step()  # gradient update
+
 
         # VIZUALIZE
         if self.iteration % 100 == 1 and self.opt.display:
             self.visualizer.show_pointclouds(points=self.points[0], title="train_input")
             self.visualizer.show_pointclouds(points=pointsReconstructed[0], title="train_input_reconstructed")
             if self.opt.dim_template == 3:
-                for i in range(self.opt.nb_primitives):
-                    self.visualizer.show_pointclouds(points=self.network.template[i].vertex, title=f"template{i}")
+                self.visualizer.show_pointclouds(points=self.network.template[0].vertex, title=f"template0")
             if self.opt.patch_deformation and self.opt.dim_out_patch == 3:
                 template = self.network.get_patch_deformation_template()
-                for i in range(self.opt.nb_primitives):
-                    self.visualizer.show_pointclouds(points=template[i], title=f"template_deformed{i}")
-
+                self.visualizer.show_pointclouds(points=template[0], title=f"template_deformed0")
         self.print_iteration_stats(loss_train_total)
+
+    def optim_reset(self, flag):
+        if flag:
+            # Currently I choose to reset the optimiser because it's to complicated to copy the branch optims
+            # optimizer = torch.optim.Adam(model.parameters(), lr=self.opt.lrate) # get new optimiser
+            # optimizer.load_state_dict(self.optimizer.state_dict()) # copy state
+            self.optimizer = torch.optim.Adam(self.network.parameters(), lr=self.opt.lrate)
 
     def train_epoch(self):
         self.log.reset()
@@ -127,8 +131,10 @@ class Trainer(AbstractTrainer):
 
     def test_iteration(self):
         pointsReconstructed = self.network(self.points)
+
         loss_val_Deformation_ChamferL2 = torch.mean(
-            (pointsReconstructed - self.points.transpose(2, 1).contiguous()) ** 2)
+                (pointsReconstructed.view(self.points.size(0), -1, 3) - self.points.transpose(2, 1).contiguous()) ** 2)
+
 
         self.log.update("loss_val_Deformation_ChamferL2", loss_val_Deformation_ChamferL2)
         print(

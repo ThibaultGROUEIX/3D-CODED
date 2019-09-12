@@ -47,8 +47,8 @@ class PointNetfeat(nn.Module):
         x, _ = torch.max(x, 2)
         x = x.view(-1, self.nlatent)
         x = F.relu(self.bn4(self.lin1(x).unsqueeze(-1)))
-        x = F.relu(self.bn5(self.lin2(x.squeeze()).unsqueeze(-1)))
-        return x.squeeze()
+        x = F.relu(self.bn5(self.lin2(x.squeeze(2)).unsqueeze(-1)))
+        return x.squeeze(2)
 
 
 class patchDeformationMLP(nn.Module):
@@ -113,6 +113,10 @@ class GetTemplate(object):
             print("select valid template type")
 
     def init_template(self):
+        if not os.path.exists("./data/template/template.ply"):
+            os.system("chmod +x ./data/download_template.sh")
+            os.system("./data/download_template.sh")
+
         mesh = trimesh.load("./data/template/template.ply", process=False)
         self.mesh = mesh
         point_set = mesh.vertices
@@ -153,31 +157,14 @@ class GetTemplate(object):
         print(f"Using training data number {index} to initialize template")
 
 
-class PrimSelect(nn.Module):
-    def __init__(self):
-        super(PrimSelect, self).__init__(bottleneck_size=1024, nb_primitives=1)
-        self.bottleneck_size = bottleneck_size
-        self.nb_primitives = nb_primitives
-        self.prim_network = nn.Sequential(
-                nn.Linear(bottleneck_size, self.bottleneck_size // 2),
-                nn.BatchNorm1d(self.bottleneck_size // 2),
-                nn.ReLU(),
-                nn.Linear(bottleneck_size // 2, nb_primitives),
-                nn.BatchNorm1d(nb_primitives),
-                nn.Sigmoid(),
-            )
-
-    def forward(self, x):
-        return self.prim_network(x)
 
 
 class AE_AtlasNet_Humans(nn.Module):
-    def __init__(self, num_points=6890, bottleneck_size=1024, nb_primitives=1, point_translation=False, dim_template=3,
-                 patch_deformation=False, dim_out_patch=3, start_from="TEMPLATE", dataset_train=None, primitive_selection=False):
+    def __init__(self, num_points=6890, bottleneck_size=1024, point_translation=False, dim_template=3,
+                 patch_deformation=False, dim_out_patch=3, start_from="TEMPLATE", dataset_train=None):
         super(AE_AtlasNet_Humans, self).__init__()
         self.num_points = num_points
         self.bottleneck_size = bottleneck_size
-        self.nb_primitives = nb_primitives
         self.point_translation = point_translation
         self.dim_template = dim_template
         self.patch_deformation = patch_deformation
@@ -186,59 +173,47 @@ class AE_AtlasNet_Humans(nn.Module):
         self.count = 0
         self.start_from = start_from
         self.dataset_train = dataset_train
-        self.primitive_selection = primitive_selection
 
-        self.template = [GetTemplate(start_from, dataset_train) for i in range(0, self.nb_primitives)]
+        self.template = [GetTemplate(start_from, dataset_train)]
         if point_translation:
             if dim_template > 3:
-                for i in range(0, self.nb_primitives):
-                    self.template[i].vertex = torch.cat([self.template[i].vertex, torch.zeros(
-                        (self.template[i].vertex.size(0), self.dim_template - 3)).cuda()], -1)
+                self.template[0].vertex = torch.cat([self.template[0].vertex, torch.zeros(
+                        (self.template[0].vertex.size(0), self.dim_template - 3)).cuda()], -1)
                 self.dim_before_decoder = dim_template
 
-            for i in range(0, self.nb_primitives):
-                self.template[i].vertex = torch.nn.Parameter(self.template[i].vertex)
-                self.register_parameter("template_vertex_" + str(i), self.template[i].vertex)
+            self.template[0].vertex = torch.nn.Parameter(self.template[0].vertex)
+            self.register_parameter("template_vertex_" + str(0), self.template[0].vertex)
 
         if patch_deformation:
             self.dim_before_decoder = dim_out_patch
             self.templateDiscovery = nn.ModuleList(
-                [patchDeformationMLP(patchDim=dim_template, patchDeformDim=dim_out_patch, tanh=True) for i in
-                 range(0, self.nb_primitives)])
+                [patchDeformationMLP(patchDim=dim_template, patchDeformDim=dim_out_patch, tanh=True)])
 
-        if self.primitive_selection:
-            self.prim_network = PrimSelect(bottleneck_size, nb_primitives)
 
         self.encoder = PointNetfeat(num_points, bottleneck_size)
         self.decoder = nn.ModuleList(
-            [PointGenCon(bottleneck_size=self.dim_before_decoder + self.bottleneck_size) for i in
-             range(0, self.nb_primitives)])
+            [PointGenCon(bottleneck_size=self.dim_before_decoder + self.bottleneck_size)])
 
-    def morph_points(self, x, idx=None, prim=False):
-        outs = []
+    def morph_points(self, x, idx=None):
         if not idx is None:
             idx = idx.view(-1)
             idx = idx.numpy().astype(np.int)
-        for i in range(0, self.nb_primitives):
-            rand_grid = self.template[i].vertex  # 6890, 3
-            if not idx is None:
-                rand_grid = rand_grid[idx, :]  # batch x 2500, 3
-                rand_grid = rand_grid.view(x.size(0), -1, self.dim_template).transpose(1,
-                                                                                       2).contiguous()  # batch , 2500, 3 -> batch, 6980, 3
-            else:
-                rand_grid = rand_grid.transpose(0, 1).contiguous().unsqueeze(0).expand(x.size(0), self.dim_template,
-                                                                                       -1)  # 3, 6980 -> 1,3,6980 -> batch, 3, 6980
 
-            # rand_grid = Variable(rand_grid) I have removed this line t make sure gradients gets back to self.template.vertex even with forward idx
-            if self.patch_deformation:
-                rand_grid = self.templateDiscovery[i](rand_grid)
-            y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
-            y = torch.cat((rand_grid, y), 1).contiguous()
-            outs.append(self.decoder[i](y))
-        if prim:
-            return outs#, self.prim_network(x)
+        rand_grid = self.template[0].vertex  # 6890, 3
+        if not idx is None:
+            rand_grid = rand_grid[idx, :]  # batch x 2500, 3
+            rand_grid = rand_grid.view(x.size(0), -1, self.dim_template).transpose(1,
+                                                                                   2).contiguous()  # batch , 2500, 3 -> batch, 6980, 3
         else:
-            return torch.cat(outs, 2).contiguous().transpose(2, 1).contiguous()
+            rand_grid = rand_grid.transpose(0, 1).contiguous().unsqueeze(0).expand(x.size(0), self.dim_template,
+                                                                                   -1)  # 3, 6980 -> 1,3,6980 -> batch, 3, 6980
+
+        if self.patch_deformation:
+            rand_grid = self.templateDiscovery[0](rand_grid)
+        y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
+        y = torch.cat((rand_grid, y), 1).contiguous()
+        return self.decoder[0](y).contiguous().transpose(2, 1).contiguous()  # batch, 1, 3, num_point
+
 
     def decode(self, x, idx=None):
         return self.morph_points(x, idx)
@@ -248,28 +223,24 @@ class AE_AtlasNet_Humans(nn.Module):
         return self.decode(x, idx)
 
     def decode_full(self, x):
-        """
-        This function only works if nb_primitives == 1. TODO : make it generic
-        :param x:
-        :return:
-        """
+
         outs = []
         div = 20
-        batch = int(self.template.num_vertex_HR / div)
+        batch = int(self.template[0].num_vertex_HR / div)
         for i in range(div - 1):
             rand_grid = self.template[0].vertex_HR[batch * i:batch * (i + 1)].view(x.size(0), batch,
                                                                                    self.dim_template).transpose(1,
                                                                                                                 2).contiguous()
             if self.patch_deformation:
-                rand_grid = self.templateDiscovery[i](rand_grid)
+                rand_grid = self.templateDiscovery[0](rand_grid)
             y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
             y = torch.cat((rand_grid, y), 1).contiguous()
             outs.append(self.decoder[0](y))
             torch.cuda.synchronize()
         i = div - 1
-        rand_grid = self.template[0].vertex_HR[batch * i:].view(x.size(0), -1, self.dim_template).transpose(1,
-                                                                                                            2).contiguous()
-        rand_grid = Variable(rand_grid)
+        rand_grid = self.template[0].vertex_HR[batch * i:].view(x.size(0), -1, self.dim_template).transpose(1,2).contiguous()
+        if self.patch_deformation:
+            rand_grid = self.templateDiscovery[0](rand_grid)
         y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
         y = torch.cat((rand_grid, y), 1).contiguous()
         outs.append(self.decoder[0](y))
@@ -277,68 +248,87 @@ class AE_AtlasNet_Humans(nn.Module):
         return torch.cat(outs, 2).contiguous().transpose(2, 1).contiguous()
 
     def get_points_translation_template(self):
-        templates = []
-        for i in range(0, self.nb_primitives):
-            templates.append(self.template[i].vertex)
-        return templates
+        return [self.template[0].vertex]
 
     def get_patch_deformation_template(self):
-        templates = []
-        for i in range(0, self.nb_primitives):
-            rand_grid = self.template[i].vertex.transpose(0, 1).contiguous().unsqueeze(0).expand(1, self.dim_template,
-                                                                                                 -1)
-            templates.append(self.templateDiscovery[i](rand_grid).squeeze().transpose(1, 0).contiguous())
-        return templates
+        rand_grid = self.template[0].vertex.transpose(0, 1).contiguous().unsqueeze(0).expand(1, self.dim_template,-1)
+        return [self.templateDiscovery[0](rand_grid).squeeze().transpose(1, 0).contiguous()]
+
+    def make_high_res_template_from_low_res(self):
+        """
+        This function takes a path to the orginal shapenet model and subsample it nicely
+        """
+        import pymesh
+        templates = self.get_points_translation_template()
+        if self.dim_template == 3:
+            template_points = templates[0].cpu().clone().detach().numpy()
+            obj1 = pymesh.form_mesh(vertices=template_points, faces=self.template[0].mesh.faces)
+            if len(obj1.vertices)<100000:
+                obj1 = pymesh.split_long_edges(obj1, 0.02)[0]
+                while len(obj1.vertices)<100000:
+                    obj1 = pymesh.subdivide(obj1)
+            self.template[0].mesh_HR = obj1
+            self.template[0].mesh_HR = obj1
+            self.template[0].vertex_HR = torch.from_numpy(obj1.vertices).cuda().float()
+            self.template[0].num_vertex_HR = self.template[0].vertex_HR.size(0)
+            print(f"Make high res template with {self.template[0].num_vertex_HR} points.")
 
     def save_template_png(self, path):
         if self.point_translation:
             templates = self.get_points_translation_template()
             if self.dim_template == 3:
-                for i in range(0, self.nb_primitives):
-                    p1 = templates[i][:, 0].cpu().clone().detach().numpy()
-                    p2 = templates[i][:, 1].cpu().clone().detach().numpy()
-                    p3 = templates[i][:, 2].cpu().clone().detach().numpy()
-                    fig = plt.figure(figsize=(20, 20), dpi=80)
-                    fig.set_size_inches(20, 20)
-                    ax = fig.add_subplot(111, projection='3d', facecolor='white')
-                    # ax = fig.add_subplot(111, projection='3d',  facecolor='#202124')
-                    ax.view_init(0, 30)
-                    ax.set_xlim3d(-0.8, 0.8)
-                    ax.set_ylim3d(-0.8, 0.8)
-                    ax.set_zlim3d(-0.8, 0.8)
-                    # ax.set_xlabel('X Label')
-                    # ax.set_ylabel('Y Label')
-                    # ax.set_zlabel('Z Label')
-                    ax.scatter(p3, p1, p2, alpha=1, s=10, c='salmon', edgecolor='orangered')
-                    plt.grid(b=None)
-                    plt.axis('off')
-                    fig.savefig(os.path.join(path, "points_" + str(i) + "_" + str(self.count)), bbox_inches='tight',
-                                pad_inches=0)
+                template_points = templates[0].cpu().clone().detach().numpy()
+                mesh_point_translation = trimesh.Trimesh(vertices=template_points,
+                            faces=self.template[0].mesh.faces, process=False)
+                mesh_point_translation.export(os.path.join(path, "mesh_point_translation.ply"))
+
+                p1 = template_points[:, 0]
+                p2 = template_points[:, 1]
+                p3 = template_points[:, 2]
+                fig = plt.figure(figsize=(20, 20), dpi=80)
+                fig.set_size_inches(20, 20)
+                ax = fig.add_subplot(111, projection='3d', facecolor='white')
+                # ax = fig.add_subplot(111, projection='3d',  facecolor='#202124')
+                ax.view_init(0, 30)
+                ax.set_xlim3d(-0.8, 0.8)
+                ax.set_ylim3d(-0.8, 0.8)
+                ax.set_zlim3d(-0.8, 0.8)
+                # ax.set_xlabel('X Label')
+                # ax.set_ylabel('Y Label')
+                # ax.set_zlabel('Z Label')
+                ax.scatter(p3, p1, p2, alpha=1, s=10, c='salmon', edgecolor='orangered')
+                plt.grid(b=None)
+                plt.axis('off')
+                fig.savefig(os.path.join(path, "points_" + str(0) + "_" + str(self.count)), bbox_inches='tight',
+                            pad_inches=0)
             else:
                 print("can't save png if dim template is not 3!")
         if self.patch_deformation:
             templates = self.get_patch_deformation_template()
             if self.dim_template == 3:
-                for i in range(0, self.nb_primitives):
-                    p1 = templates[i][:, 0].cpu().clone().detach().numpy()
-                    p2 = templates[i][:, 1].cpu().clone().detach().numpy()
-                    p3 = templates[i][:, 2].cpu().clone().detach().numpy()
-                    fig = plt.figure(figsize=(20, 20), dpi=80)
-                    fig.set_size_inches(20, 20)
-                    ax = fig.add_subplot(111, projection='3d', facecolor='white')
-                    # ax = fig.add_subplot(111, projection='3d',  facecolor='#202124')
-                    ax.view_init(0, 30)
-                    ax.set_xlim3d(-0.8, 0.8)
-                    ax.set_ylim3d(-0.8, 0.8)
-                    ax.set_zlim3d(-0.8, 0.8)
-                    # ax.set_xlabel('X Label')
-                    # ax.set_ylabel('Y Label')
-                    # ax.set_zlabel('Z Label')
-                    ax.scatter(p3, p1, p2, alpha=1, s=10, c='salmon', edgecolor='orangered')
-                    plt.grid(b=None)
-                    plt.axis('off')
-                    fig.savefig(os.path.join(path, "deformation_" + str(i) + "_" + str(self.count)),
-                                bbox_inches='tight', pad_inches=0)
+                template_points = templates[0].cpu().clone().detach().numpy()
+                mesh_patch_deformation = trimesh.Trimesh(vertices=template_points,
+                faces=self.template[0].mesh.faces, process=False)
+                mesh_patch_deformation.export(os.path.join(path, "mesh_patch_deformation.ply"))
+                p1 = template_points[:, 0]
+                p2 = template_points[:, 1]
+                p3 = template_points[:, 2]
+                fig = plt.figure(figsize=(20, 20), dpi=80)
+                fig.set_size_inches(20, 20)
+                ax = fig.add_subplot(111, projection='3d', facecolor='white')
+                # ax = fig.add_subplot(111, projection='3d',  facecolor='#202124')
+                ax.view_init(0, 30)
+                ax.set_xlim3d(-0.8, 0.8)
+                ax.set_ylim3d(-0.8, 0.8)
+                ax.set_zlim3d(-0.8, 0.8)
+                # ax.set_xlabel('X Label')
+                # ax.set_ylabel('Y Label')
+                # ax.set_zlabel('Z Label')
+                ax.scatter(p3, p1, p2, alpha=1, s=10, c='salmon', edgecolor='orangered')
+                plt.grid(b=None)
+                plt.axis('off')
+                fig.savefig(os.path.join(path, "deformation_" + str(0) + "_" + str(self.count)),
+                            bbox_inches='tight', pad_inches=0)
             else:
                 print("can't save png if dim template is not 3!")
         self.count += 1

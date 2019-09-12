@@ -44,15 +44,12 @@ def parser():
 
     # Network
     parser.add_argument('--model', type=str, default='', help='optional reload model path')
-    parser.add_argument('--nb_primitives', type=int, default=1, help='number of primitives')
     parser.add_argument('--point_translation', type=int, default=0, help='point_translation')
     parser.add_argument('--dim_template', type=int, default=3, help='dim_template')
     parser.add_argument('--patch_deformation', type=int, default=0, help='patch_deformation')
     parser.add_argument('--dim_out_patch', type=int, default=3, help='dim_out_patch')
     parser.add_argument('--start_from', type=str, default="TEMPLATE", choices=["TEMPLATE, SOUP, TRAINDATA"] ,help='dim_out_patch')
 
-    # Superquadrics
-    parser.add_argument('--primitive_selection', type=int, default=0, help='Use primitive selection')
 
     # Loss
     parser.add_argument(
@@ -86,7 +83,6 @@ def parser():
     opt.display = my_utils.int_2_boolean(opt.display)
     opt.point_translation = my_utils.int_2_boolean(opt.point_translation)
     opt.patch_deformation = my_utils.int_2_boolean(opt.patch_deformation)
-    opt.primitive_selection = my_utils.int_2_boolean(opt.primitive_selection)
 
     opt.date = str(datetime.datetime.now())
     now = datetime.datetime.now()
@@ -96,7 +92,6 @@ def parser():
         print("Modifying input arguments to match network in dirname")
         with open(os.path.join(opt.dir_name, "options.json"), 'r') as f:
             my_opt_dict = json.load(f)
-        opt.nb_primitives = my_opt_dict["nb_primitives"]
         opt.point_translation = my_opt_dict["point_translation"]
         opt.dim_template = my_opt_dict["dim_template"]
         opt.patch_deformation = my_opt_dict["patch_deformation"]

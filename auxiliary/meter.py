@@ -2,7 +2,7 @@ import numpy as np
 from termcolor import colored
 import matplotlib.pyplot as plt
 import os
-
+import torch
 
 class AverageValueMeter(object):
     """
@@ -64,8 +64,11 @@ class Logs(object):
         """
         for name in self.curves_names:
             self.curves[name].append(self.meters[name].avg)
-            self.current_epoch[name] = self.meters[name].avg
-            print(colored(name, 'yellow') + " " + colored('%.4f' % self.meters[name].avg, 'cyan'))
+            print(colored(name, 'yellow') + " " + colored(f"{self.meters[name].avg}", 'cyan'))
+            if name == "cluster_assignments_val" or name == "cluster_assignments":
+                continue
+            else:
+                self.current_epoch[name] = self.meters[name].avg
 
     def reset(self):
         """
@@ -98,6 +101,7 @@ class Logs(object):
         else:
             return np.column_stack((A, B))
 
+
     def update_curves(self, vis, path):
         X_Loss = None
         Y_Loss = None
@@ -118,7 +122,7 @@ class Logs(object):
                 Y_iou = self.stack_numpy_array(Y_iou, np.array(self.curves[name]))
 
             else:
-                print("Dont know what to do with name")
+                print(f"Dont know what to do with {name}")
 
         vis.line(X=X_Loss,
                  Y=Y_Loss,
