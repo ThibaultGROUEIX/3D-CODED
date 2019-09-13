@@ -414,11 +414,11 @@ class Inference(object):
 
 
 if __name__ == '__main__':
-    opt = argument_parser.parser()
-    my_utils.plant_seeds(randomized_seed=opt.randomize)
     if not os.path.exists("learning_elementary_structure_trained_models/0point_translation/network.pth"):
         os.system("chmod +x ./inference/download_trained_models.sh")
         os.system("./inference/download_trained_models.sh")
+    opt = argument_parser.parser()
+    my_utils.plant_seeds(randomized_seed=opt.randomize)
     trainer = trainer.Trainer(opt)
     trainer.build_network()
     my_utils.plant_seeds(randomized_seed=opt.randomize)
