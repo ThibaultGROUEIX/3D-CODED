@@ -1,5 +1,5 @@
 import argparse
-import auxiliary.my_utils as my_utils
+import my_utils
 import os
 import datetime
 import json
