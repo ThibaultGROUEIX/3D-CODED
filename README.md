@@ -44,7 +44,7 @@ Task : put them in point-wise correspondence. (suggested by color)
 This implementation uses [Pytorch](http://pytorch.org/). 
 
 ```shell
-git clone git@github.com:ThibaultGROUEIX/3D-CODED.git ## Download the repo
+git clone https://github.com/ThibaultGROUEIX/3D-CODED.git ## Download the repo
 git submodule update --init
 conda env create -f 3D-CODED-ENV.yml ## Create python env
 source activate pytorch-3D-CODED
