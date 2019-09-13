@@ -3,26 +3,27 @@ import os
 import gpustat
 import time
 
+def parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', type=str, default="inference", choices=['training', 'inference', ''])
+    opt = parser.parse_args()
+    return opt
 
+opt = parser()
 
 class Experiments(object):
     def __init__(self):
         self.inference = {
-            # 0: "python inference/script.py --id 0 --randomize 0 --LR_input 0 --model_path ./log/2019-09-05T21:21:12.069673/network_last.pth",
-            # 1: "python inference/script.py --id 1 --randomize 0 --LR_input 0 --model_path ./log/2019-09-05T21:23:32.544225/network_last.pth",
-            # 2: "python inference/script.py --id 2 --randomize 0 --LR_input 0 --model_path ./log/2019-09-05T22:46:04.314684/network_last.pth",
-            3: "python inference/script.py --id 3 --randomize 0 --LR_input 0",
-            # 4: "python inference/script.py --id 4 --randomize 1 --LR_input 1",
-            # 5: "python inference/script.py --id 5 --randomize 1 --LR_input 1",
-            # 6: "python inference/script.py --id 6 --randomize 1 --LR_input 1",
-            # 7: "python inference/script.py --id 7 --randomize 1 --LR_input 1",
-            # 8: "python inference/script.py --id 8 --randomize 1 --LR_input 1",
-            # 9: "python inference/script.py --id 9 --randomize 1 --LR_input 1",
+            0: "python inference/script.py --dir_name learning_elementary_structure_trained_models/0point_translation --HR 1 --faust INTRA",
+            1: "python inference/script.py --dir_name learning_elementary_structure_trained_models/1patch_deformation --HR 1 --faust INTRA",
+            2: "python inference/script.py --dir_name learning_elementary_structure_trained_models/2point_translation_and_patch_deformation --HR 1 --faust INTRA",
+            3: "python inference/script.py --dir_name learning_elementary_structure_trained_models/3D_CODED --HR 1 --faust INTRA",
         }
         self.trainings = {
-            0: "python training/train_sup_2.py --id 0",
-            1: "python training/train_sup_2.py --id 1",
-            2: "python training/train_sup_2.py --id 2",
+            0: "python training/train.py --id 0 --point_translation 1 --patch_deformation 0",
+            1: "python training/train.py --id 1 --point_translation 0 --patch_deformation 1",
+            2: "python training/train.py --id 2 --point_translation 0 --patch_deformation 0",
+            3: "python training/train.py --id 3 --point_translation 1 --patch_deformation 1",
         }
 
 exp = Experiments()
@@ -61,5 +62,26 @@ def job_scheduler(dict_of_jobs):
         os.system(CMD)
 
 
-job_scheduler(exp.inference)
-# job_scheduler(exp.trainings)
+if not os.path.exists("./data/datas_surreal_train.pth"):
+            os.system("chmod +x ./data/download_dataset.sh")
+            os.system("./data/download_dataset.sh")
+            os.system("mv *.pth data/")
+
+if not os.path.exists("./data/template/template.ply"):
+    os.system("chmod +x ./data/download_template.sh")
+    os.system("./data/download_template.sh")
+
+if not os.path.exists("log_terminals"):
+    print("Creating log_terminals folder")
+    os.mkdir("log_terminals")
+
+
+if opt.mode == "training":
+    print("training mode")
+    job_scheduler(exp.trainings)
+if opt.mode == "inference":
+    if not os.path.exists("learning_elementary_structure_trained_models/0point_translation/network.pth"):
+        os.system("chmod +x ./inference/download_trained_models.sh")
+        os.system("./inference/download_trained_models.sh")
+    print("inference mode")
+    job_scheduler(exp.inference)
