@@ -38,7 +38,7 @@ def main(opt, network):
     if opt.point_translation:
         network.make_high_res_template_from_low_res()
     inf = correspondences.Inference(model_path=opt.model_path, save_path=opt.dir_name, LR_input=opt.LR_input,
-                                    network=network, HR=opt.HR, reg_num_steps=opt.reg_num_steps)
+                                    network=network, HR=opt.HR, reg_num_steps=opt.reg_num_steps, uniformize = opt.uniformize)
 
     if opt.faust == "INTER":
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_006.ply"),

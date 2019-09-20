@@ -187,9 +187,16 @@ def center_bounding_box(points):
     # ouput : Numpy Tensor N_pts, D_dim
     # Center bounding box of first 3 dimensions
     if isinstance(points, torch.Tensor):
+        points = points.squeeze()
+        transpo = False
+        if points.size(0)==3:
+            transpo = True
+            points=points.transpose(1,0).contiguous()
         min_vals = torch.min(points, 0)[0]
         max_vals = torch.max(points, 0)[0]
         points = points - (min_vals + max_vals) / 2
+        if transpo:
+            points=points.transpose(1,0).contiguous()
         return points, (min_vals + max_vals) / 2, (max_vals - min_vals)/2
     elif isinstance(points, np.ndarray):
         min_vals = np.min(points, 0)
@@ -199,6 +206,50 @@ def center_bounding_box(points):
     else:
         print(type(points))
         print("Pierre-Alain was right.")
+
+
+class RotateCenterPointCloud(object):
+    def __init__(self, points):
+        self.points = points.clone()
+
+    def rotate_theta(self, theta):
+        rot_matrix = np.array(
+            [[np.cos(theta), 0, np.sin(theta)], [0, 1, 0], [- np.sin(theta), 0, np.cos(theta)]])
+        self.rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
+
+        inv_rot_matrix = np.array(
+            [[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [- np.sin(-theta), 0, np.cos(-theta)]])
+        inv_rot_matrix = torch.from_numpy(inv_rot_matrix).float().cuda()
+        self.inv_rot_matrix = inv_rot_matrix
+
+    def rotate_phi(self, phi):
+        self.rot_matrix = torch.matmul(torch.from_numpy(np.array(
+            [[np.cos(phi), np.sin(phi), 0], [-np.sin(phi), np.cos(phi), 0], [0, 0, 1], ])).float().cuda(),
+                                  self.rot_matrix)
+        self.inv_rot_matrix = torch.matmul(self.inv_rot_matrix, torch.from_numpy(np.array(
+            [[np.cos(-phi), np.sin(-phi), 0], [-np.sin(-phi), np.cos(-phi), 0], [0, 0, 1], ])).float().cuda(),
+                                  )
+
+    def apply_rotation(self, points):
+        self.rotated_points = torch.matmul(self.rot_matrix, points)
+
+    def center(self, points):
+        points, mean_bb, size_bb = center_bounding_box(points)
+        # point = points - mean_bb Already done in center_bounding_box
+        self.mean_bb = mean_bb
+        self.centered_points = points.unsqueeze(0)
+
+    def rotate_center(self, phi, theta):
+        self.rotate_theta(theta)
+        self.rotate_phi(phi)
+        self.apply_rotation(self.points.clone())
+        self.center(self.rotated_points)
+
+
+    def back(self, points):
+        points = points + self.mean_bb
+        return torch.matmul(points, self.inv_rot_matrix.transpose(1, 0))
+
 
 
 

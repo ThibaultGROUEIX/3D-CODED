@@ -40,6 +40,9 @@ class Trainer(AbstractTrainer):
             network.load_state_dict(torch.load(self.opt.model))
 
         self.network = network
+        self.network.eval()
+        self.network.save_template_png(self.opt.dir_name)
+        self.network.train()
 
     def build_optimizer(self):
         """

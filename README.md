@@ -18,7 +18,7 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 
 | Method | Faust Intra results |  Faust Inter results |
 | ------------------------------------------ | ----- |  ----- |
-| **3D-CODED**                               | 1.978 |3.047 TODO |
+| **3D-CODED**                               | 1.978 |2.804 |
 | **Points Translation**                      | **1.689** |2.687 |
 | **Patch Deformation**                                 | 1.822 | 2.636 |
 |  **Points Translation + Patch Deformation** |1.727|  **2.594**  |

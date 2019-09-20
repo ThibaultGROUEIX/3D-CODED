@@ -70,6 +70,7 @@ def parser():
     parser.add_argument('--clean', type=int, default=1, help='if 1, remove points that dont belong to any edges')
     parser.add_argument('--scale', type=int, default=1, help='if 1, scale input mesh to have same volume as the template')
     parser.add_argument('--project_on_target', type=int, default=0,  help='if 1, projects predicted correspondences point on target mesh')
+    parser.add_argument('--uniformize', type=int, default=1, help='if 1, scale input mesh to have same volume as the template')
 
     opt = parser.parse_args()
 
@@ -84,6 +85,7 @@ def parser():
     opt.display = my_utils.int_2_boolean(opt.display)
     opt.point_translation = my_utils.int_2_boolean(opt.point_translation)
     opt.patch_deformation = my_utils.int_2_boolean(opt.patch_deformation)
+    opt.uniformize = my_utils.int_2_boolean(opt.uniformize)
 
     opt.date = str(datetime.datetime.now())
     now = datetime.datetime.now()

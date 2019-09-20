@@ -26,11 +26,12 @@ import argument_parser
 import my_utils
 import trainer
 import matplotlib.pyplot as plt
-
+from termcolor import colored
+import pointcloud_processor
 
 class Inference(object):
     def __init__(self, HR=1, reg_num_steps=3000, model_path='trained_models/sup_human_network_last.pth', num_points=6890,
-                 num_angles=100, clean=1, scale=1, project_on_target=0, save_path=None, LR_input=True, network = None):
+                 num_angles=100, clean=1, scale=1, project_on_target=0, save_path=None, LR_input=True, network = None, uniformize=True):
         self.LR_input = LR_input
         self.HR = HR
         self.reg_num_steps = reg_num_steps
@@ -41,7 +42,7 @@ class Inference(object):
         self.scale = scale
         self.project_on_target = project_on_target
         self.distChamfer = ext.chamferDist()
-
+        self.uniformize = uniformize
         # load network
         if network is None:
             self.network = model.AE_AtlasNet_Humans(num_points=self.num_points)
@@ -148,7 +149,8 @@ class Inference(object):
         i = 0
 
         # learning loop
-        while np.log(loss) > -9 and i < self.reg_num_steps:
+        # while np.log(loss) > -9.5 and i < self.reg_num_steps:
+        while np.log(loss) > -9.5 and i < self.reg_num_steps:
             self.optimizer.zero_grad()
             pointsReconstructed = self.network.decode(input_param)  # forward pass
             pointsReconstructed = pointsReconstructed.view(pointsReconstructed.size(0), -1, 3)
@@ -158,6 +160,19 @@ class Inference(object):
             loss_net.backward()
             self.optimizer.step()
             loss = loss_net.item()
+            if i==0:
+                print(f"Initial Loss: {loss}")
+            print(
+                f"\r["
+                + f": "
+                + colored(f"{i}", "red")
+                + "/"
+                + colored(f"{int(self.reg_num_steps)}", "red")
+                + "] reg loss:  "
+                + colored(f"{loss}", "yellow"),
+                end="",
+            )
+
             i = i + 1
         with torch.no_grad():
             if self.HR:
@@ -212,6 +227,7 @@ class Inference(object):
         points_LR = points_LR.cuda()
 
         theta = 0
+        best_template = 0
         bestLoss = 10
         pointsReconstructed = self.network(points_LR)
         pointsReconstructed = pointsReconstructed.view(pointsReconstructed.size(0), -1, 3)
@@ -225,6 +241,8 @@ class Inference(object):
 
         THETA, PHI = np.meshgrid(x, y)
         Z = np.ndarray([THETA.shape[0], THETA.shape[1]])
+
+        rotateCenterPointCloud = pointcloud_processor.RotateCenterPointCloud(points_LR)
         for j in range(THETA.shape[1]):
             for i in range(THETA.shape[0]):
                 if self.num_angles == 1:
@@ -232,50 +250,22 @@ class Inference(object):
                     phi = 0
                 theta = THETA[i, j]
                 phi = PHI[i, j]
-
-                #  Rotate mesh by theta and renormalise
-                rot_matrix = np.array(
-                    [[np.cos(theta), 0, np.sin(theta)], [0, 1, 0], [- np.sin(theta), 0, np.cos(theta)]])
-                rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
-                rot_matrix = torch.matmul(torch.from_numpy(np.array(
-                    [[np.cos(phi), np.sin(phi), 0], [-np.sin(phi), np.cos(phi), 0], [0, 0, 1], ])).float().cuda(),
-                                          rot_matrix)
-                points2 = torch.matmul(rot_matrix, points_LR)
-                mesh_tmp = trimesh.Trimesh(process=False, use_embree=False,
-                                           vertices=points2[0].transpose(1, 0).data.cpu().numpy(),
-                                           faces=self.network.template[0].mesh.faces)
-                # bbox
-                bbox = np.array([[np.max(mesh_tmp.vertices[:, 0]), np.max(mesh_tmp.vertices[:, 1]),
-                                  np.max(mesh_tmp.vertices[:, 2])],
-                                 [np.min(mesh_tmp.vertices[:, 0]), np.min(mesh_tmp.vertices[:, 1]),
-                                  np.min(mesh_tmp.vertices[:, 2])]])
-                norma = torch.from_numpy((bbox[0] + bbox[1]) / 2).float().cuda()
-
-                norma2 = norma.unsqueeze(1).expand(3, points2.size(2)).contiguous()
-                points2[0] = points2[0] - norma2
-
-                # reconstruct rotated mesh
-                pointsReconstructed = self.network(points2)
+                rotateCenterPointCloud.rotate_center(phi, theta)
+                input_network = rotateCenterPointCloud.centered_points
+                pointsReconstructed = self.network(input_network)
                 pointsReconstructed = pointsReconstructed.view(pointsReconstructed.size(0), -1, 3)
-                dist1, dist2 = distChamfer(points2.transpose(2, 1).contiguous(), pointsReconstructed)
-
+                dist1, dist2 = distChamfer(input_network.transpose(2, 1).contiguous(), pointsReconstructed)
                 loss_net = (torch.mean(dist1)) + (torch.mean(dist2))
+
                 Z[i, j] = loss_net.item()
+
                 if loss_net < bestLoss:
-                    print(theta, phi, loss_net)
+                    print(theta, phi, loss_net.item())
                     bestLoss = loss_net
                     best_theta = theta
                     best_phi = phi
                     # unrotate the mesh
-                    norma3 = norma.unsqueeze(0).expand(pointsReconstructed.size(1), 3).contiguous()
-                    pointsReconstructed[0] = pointsReconstructed[0] + norma3
-                    rot_matrix = np.array(
-                        [[np.cos(-theta), 0, np.sin(-theta)], [0, 1, 0], [- np.sin(-theta), 0, np.cos(-theta)]])
-                    rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
-                    rot_matrix = torch.matmul(rot_matrix, torch.from_numpy(np.array(
-                        [[np.cos(-phi), np.sin(-phi), 0], [-np.sin(-phi), np.cos(-phi), 0],
-                         [0, 0, 1], ])).float().cuda())
-                    pointsReconstructed = torch.matmul(pointsReconstructed, rot_matrix.transpose(1, 0))
+                    pointsReconstructed[0] = rotateCenterPointCloud.back(pointsReconstructed[0])
                     bestPoints = pointsReconstructed
 
         try:
@@ -314,31 +304,15 @@ class Inference(object):
             plt.savefig("curve.png")
         except:
             pass
-        # START REGRESSION
+
+        # START REGRESSION on high rez input
         print("start regression...")
 
-        # rotate with optimal angle
-        rot_matrix = np.array(
-            [[np.cos(best_theta), 0, np.sin(best_theta)], [0, 1, 0], [- np.sin(best_theta), 0, np.cos(best_theta)]])
-        rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
-        points2 = torch.matmul(rot_matrix, points)
-        mesh_tmp = trimesh.Trimesh(vertices=points2[0].transpose(1, 0).data.cpu().numpy(),
-                                   faces=self.network.template[0].mesh.faces, process=False)
-        bbox = np.array(
-            [[np.max(mesh_tmp.vertices[:, 0]), np.max(mesh_tmp.vertices[:, 1]), np.max(mesh_tmp.vertices[:, 2])],
-             [np.min(mesh_tmp.vertices[:, 0]), np.min(mesh_tmp.vertices[:, 1]), np.min(mesh_tmp.vertices[:, 2])]])
-        norma = torch.from_numpy((bbox[0] + bbox[1]) / 2).float().cuda()
-        norma2 = norma.unsqueeze(1).expand(3, points2.size(2)).contiguous()
-        points2[0] = points2[0] - norma2
-        pointsReconstructed1 = self.regress(points2)
-        # unrotate with optimal angle
-        norma3 = norma.unsqueeze(0).expand(pointsReconstructed1.size(1), 3).contiguous()
-        rot_matrix = np.array(
-            [[np.cos(-best_theta), 0, np.sin(-best_theta)], [0, 1, 0], [- np.sin(-best_theta), 0, np.cos(-best_theta)]])
-        rot_matrix = torch.from_numpy(rot_matrix).float().cuda()
-        pointsReconstructed1[0] = pointsReconstructed1[0] + norma3
-        pointsReconstructed1 = torch.matmul(pointsReconstructed1, rot_matrix.transpose(1, 0))
-
+        rotateCenterPointCloud = pointcloud_processor.RotateCenterPointCloud(points)
+        rotateCenterPointCloud.rotate_center(best_phi, best_theta)
+        input_network = rotateCenterPointCloud.centered_points
+        pointsReconstructed1 = self.regress(input_network)
+        pointsReconstructed1[0] = rotateCenterPointCloud.back(pointsReconstructed1[0])
         # create optimal reconstruction
         meshReg = trimesh.Trimesh(vertices=(pointsReconstructed1[0].data.cpu().numpy() + translation) / scalefactor,
                                   faces=faces_tosave, process=False)
@@ -384,8 +358,12 @@ class Inference(object):
         if self.scale:
             input, scalefactor = my_utils.scale(input,
                                                 self.mesh_ref_LR)  # scale input to have the same volume as mesh_ref_LR
+        if self.uniformize:
+            input = my_utils.uniformize(input)
         if self.clean:
             input = my_utils.clean(input)  # remove points that doesn't belong to any edges
+
+
         my_utils.test_orientation(input)
         mesh, meshReg = self.run(input, scalefactor, input_p)
 
@@ -405,7 +383,7 @@ class Inference(object):
                       self.blue_LR)
             self.save(meshReg, mesh_ref, input_p[:-4] + "FinalReconstruction.ply", red, green, blue)
         else:
-            self.save(mesh, self.mesh_ref_LR, os.path.join(self.save_path, input_p[-8:-4] + "InitialGuess.ply"),
+            self.save(mesh, self.mesh_ref_LR, os.path.join(self.save_path, input_p[-8:-4] + f"InitialGuess.ply"),
                       self.red_LR, self.green_LR, self.blue_LR)
             self.save(meshReg, mesh_ref, os.path.join(self.save_path, input_p[-8:-4] + "FinalReconstruction.ply"), red,
                       green, blue)
