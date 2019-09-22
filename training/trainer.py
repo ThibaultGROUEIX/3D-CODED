@@ -42,7 +42,7 @@ class Trainer(AbstractTrainer):
         self.network = network
         self.network.eval()
         self.network.save_template_png(self.opt.dir_name)
-        self.network.train()
+        # self.network.train()
 
     def build_optimizer(self):
         """

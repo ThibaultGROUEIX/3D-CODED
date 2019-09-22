@@ -14,10 +14,10 @@ opt = parser()
 class Experiments(object):
     def __init__(self):
         self.inference = {
-            0: "python inference/script.py --dir_name learning_elementary_structure_trained_models/0point_translation --HR 1 --faust INTRA",
-            1: "python inference/script.py --dir_name learning_elementary_structure_trained_models/1patch_deformation --HR 1 --faust INTRA",
-            2: "python inference/script.py --dir_name learning_elementary_structure_trained_models/2point_translation_and_patch_deformation --HR 1 --faust INTRA",
-            3: "python inference/script.py --dir_name learning_elementary_structure_trained_models/3D_CODED --HR 1 --faust INTRA",
+            0: "python inference/script.py --dir_name learning_elementary_structure_trained_models/0point_translation --HR 1 --faust INTER",
+            1: "python inference/script.py --dir_name learning_elementary_structure_trained_models/1patch_deformation --HR 1 --faust INTER",
+            2: "python inference/script.py --dir_name learning_elementary_structure_trained_models/2point_translation_and_patch_deformation --HR 1 --faust INTER",
+            3: "python inference/script.py --dir_name learning_elementary_structure_trained_models/3D_CODED --HR 1 --faust INTER",
         }
         self.trainings = {
             0: "python training/train.py --id 0 --point_translation 1 --patch_deformation 0",
