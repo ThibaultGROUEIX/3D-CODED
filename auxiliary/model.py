@@ -274,6 +274,8 @@ class AE_AtlasNet_Humans(nn.Module):
             print(f"Make high res template with {self.template[0].num_vertex_HR} points.")
 
     def save_template_png(self, path):
+        print("Saving template...")
+        self.eval()
         if self.point_translation:
             templates = self.get_points_translation_template()
             if self.dim_template == 3:
