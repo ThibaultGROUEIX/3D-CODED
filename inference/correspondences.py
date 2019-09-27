@@ -139,6 +139,7 @@ class Inference(object):
         :param points: input points to reconstruct
         :return pointsReconstructed: final reconstruction after optimisation
         """
+        self.network.eval()
         points = points.data
         latent_code = self.network.encoder(points)
         lrate = 0.001  # learning rate

@@ -22,6 +22,7 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 | **Points Translation**                      | **1.689** |2.687 |
 | **Patch Deformation**                                 | 1.822 | 2.636 |
 |  **Points Translation + Patch Deformation** |1.727|  **2.594**  |
+|  **Points Translation + Patch Deformation + RotInvY** | - |  2.962     |
 
 </details>
 

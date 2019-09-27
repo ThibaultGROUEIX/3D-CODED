@@ -159,6 +159,7 @@ class GetTemplate(object):
 
 
 
+
 class AE_AtlasNet_Humans(nn.Module):
     def __init__(self, num_points=6890, bottleneck_size=1024, point_translation=False, dim_template=3,
                  patch_deformation=False, dim_out_patch=3, start_from="TEMPLATE", dataset_train=None):
@@ -251,6 +252,7 @@ class AE_AtlasNet_Humans(nn.Module):
         return [self.template[0].vertex]
 
     def get_patch_deformation_template(self):
+        self.eval()
         rand_grid = self.template[0].vertex.transpose(0, 1).contiguous().unsqueeze(0).expand(1, self.dim_template,-1)
         return [self.templateDiscovery[0](rand_grid).squeeze().transpose(1, 0).contiguous()]
 
