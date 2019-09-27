@@ -45,9 +45,9 @@ def parser():
 
     # Network
     parser.add_argument('--model', type=str, default='', help='optional reload model path')
-    parser.add_argument('--point_translation', type=int, default=0, help='point_translation')
+    parser.add_argument('--point_translation', type=int, default=1, help='point_translation')
     parser.add_argument('--dim_template', type=int, default=3, help='dim_template')
-    parser.add_argument('--patch_deformation', type=int, default=0, help='patch_deformation')
+    parser.add_argument('--patch_deformation', type=int, default=1, help='patch_deformation')
     parser.add_argument('--dim_out_patch', type=int, default=3, help='dim_out_patch')
     parser.add_argument('--start_from', type=str, default="TEMPLATE", choices=["TEMPLATE, SOUP, TRAINDATA"] ,help='dim_out_patch')
 
