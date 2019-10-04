@@ -35,8 +35,7 @@ def main(opt, network):
         opt.model_path = f"{opt.dir_name}/network.pth"
 
     network.save_template_png(opt.dir_name)
-    if opt.point_translation:
-        network.make_high_res_template_from_low_res()
+    network.make_high_res_template_from_low_res()
     inf = correspondences.Inference(model_path=opt.model_path, save_path=opt.dir_name, LR_input=opt.LR_input,
                                     network=network, HR=opt.HR, reg_num_steps=opt.reg_num_steps, uniformize = opt.uniformize)
 
@@ -109,10 +108,13 @@ def main(opt, network):
                     inputB=os.path.join(opt.dataset_path, "test_scan_112.ply"), path="155_112.txt")
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_156.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_014.ply"), path="156_014.txt")
+
+        # aqui
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_158.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_187.ply"), path="158_187.txt")
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_161.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_103.ply"), path="161_103.txt")
+        # aqui
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_166.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_037.ply"), path="166_037.txt")
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_167.ply"),
@@ -123,7 +125,7 @@ def main(opt, network):
                     inputB=os.path.join(opt.dataset_path, "test_scan_029.ply"), path="198_029.txt")
 
         FILES = " 006_021.txt 011_107.txt 012_043.txt 015_098.txt 028_079.txt 033_080.txt 038_196.txt 039_142.txt 045_114.txt 046_128.txt 055_191.txt 056_077.txt 061_104.txt 065_165.txt 067_019.txt 078_171.txt 084_183.txt 089_134.txt 090_068.txt 093_010.txt 094_133.txt 095_117.txt 101_152.txt 115_199.txt 124_173.txt 129_053.txt 131_174.txt 136_002.txt 137_072.txt 146_025.txt 149_057.txt 151_184.txt 155_112.txt 156_014.txt 158_187.txt 161_103.txt 166_037.txt 167_044.txt 178_180.txt 198_029.txt"
-        os.system(f"cd {opt.dir_name}; zip inter.zip {FILES}")
+        os.system(f"cd {opt.dir_name}; zip inter.zip {FILES}; cd ..")
         # os.system(f"cd {dir_name}; zip -r base{opt.id}.zip *_*.txt ; cd ../../; rm -r {dir_name}")
 
     elif opt.faust == "INTRA":

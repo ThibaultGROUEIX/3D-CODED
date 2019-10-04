@@ -24,7 +24,7 @@ class Experiments(object):
             7: "python inference/script.py --dir_name learning_elementary_structure_trained_models/3D_CODED --HR 1 --faust INTRA",
         }
         self.trainings = {
-            0: "python training/train.py --id 0 --point_translation 1 --patch_deformation 0",
+            0: "python training/train.py --id 0 --point_translation 0 --patch_deformation 1",
             1: "python training/train.py --id 1 --point_translation 0 --patch_deformation 1",
             2: "python training/train.py --id 2 --point_translation 0 --patch_deformation 0",
             3: "python training/train.py --id 3 --point_translation 1 --patch_deformation 1",
@@ -40,7 +40,7 @@ def get_first_available_gpu():
     query = gpustat.new_query()
     for gpu_id in range(len(query)):
         gpu = query[gpu_id]
-        if gpu.memory_used < 20:
+        if gpu.memory_used < 700:
             has = os.system("tmux has-session -t " + f"GPU{gpu_id}" + " 2>/dev/null")
             if not int(has)==0:
                 return gpu_id
@@ -64,6 +64,7 @@ def job_scheduler(dict_of_jobs):
         CMD = f'tmux new-session -d -s GPU{gpu_id} \; send-keys "{cmd}" Enter'
         print(CMD)
         os.system(CMD)
+        time.sleep(15)  # Sleeps for 30 sec
 
 
 if not os.path.exists("./data/datas_surreal_train.pth"):

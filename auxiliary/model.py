@@ -178,8 +178,7 @@ class AE_AtlasNet_Humans(nn.Module):
         self.template = [GetTemplate(start_from, dataset_train)]
         if point_translation:
             if dim_template > 3:
-                self.template[0].vertex = torch.cat([self.template[0].vertex, torch.zeros(
-                        (self.template[0].vertex.size(0), self.dim_template - 3)).cuda()], -1)
+                self.template[0].vertex = torch.cat([self.template[0].vertex, torch.zeros((self.template[0].vertex.size(0), self.dim_template - 3)).cuda()], -1)
                 self.dim_before_decoder = dim_template
 
             self.template[0].vertex_trans = torch.nn.Parameter(self.template[0].vertex.clone().zero_())
@@ -212,7 +211,10 @@ class AE_AtlasNet_Humans(nn.Module):
         if self.patch_deformation:
             rand_grid = self.templateDiscovery[0](rand_grid)
         if self.point_translation:
-            trans = self.template[0].vertex_trans[idx, :].view(x.size(0), -1, self.dim_template).transpose(1,2).contiguous()
+            if idx is None:
+                trans = self.template[0].vertex_trans.unsqueeze(0).transpose(1,2).contiguous().expand(x.size(0), self.dim_template, -1)
+            else:
+                trans = self.template[0].vertex_trans[idx, :].view(x.size(0), -1, self.dim_template).transpose(1,2).contiguous()
             rand_grid = rand_grid + trans
 
         y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
@@ -255,6 +257,7 @@ class AE_AtlasNet_Humans(nn.Module):
 
     def get_patch_deformation_template(self, high_res = False):
         self.eval()
+        print("WARNING: the network is now in eval mode!")
         if high_res:
             rand_grid = self.template[0].vertex_HR.transpose(0, 1).contiguous().unsqueeze(0).expand(1, self.dim_template,-1)
         else:

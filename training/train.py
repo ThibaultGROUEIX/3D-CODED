@@ -7,6 +7,7 @@ sys.path.append('/app/python/')
 import argument_parser
 import my_utils
 import script
+import time
 
 opt = argument_parser.parser()
 my_utils.plant_seeds(randomized_seed=opt.randomize)
@@ -19,6 +20,7 @@ trainer.build_dataset_test()
 trainer.build_network()
 trainer.build_optimizer()
 trainer.build_losses()
+trainer.start_train_time = time.time()
 
 for epoch in range(opt.nepoch):
     trainer.train_epoch()
@@ -28,4 +30,4 @@ for epoch in range(opt.nepoch):
     trainer.increment_epoch()
 
 trainer.save_new_experiments_results()
-script.main(opt) #Inference
+script.main(opt, trainer.network) #Inference
