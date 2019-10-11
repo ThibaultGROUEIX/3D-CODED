@@ -21,7 +21,7 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 | **3D-CODED**                                         | 1.098 | 1.315   | 1.747         |2.641               |
 | **Points Translation**                              |9.980 | 1.263 | **1.626** | 2.714 |
 | **Patch Deformation**                             | 1.028| 1.436      |1.742               | **2.578**    |
-| **Points Translation + Patch Deformation**           |**0.969**| **1.173 ** |1.676              | 2.779       |
+| **Points Translation + Patch Deformation**           |**0.969**| **1.173** | 1.676              | 2.779       |
 
 
 
