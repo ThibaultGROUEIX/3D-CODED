@@ -31,3 +31,5 @@ for epoch in range(opt.nepoch):
 
 trainer.save_new_experiments_results()
 script.main(opt, trainer.network) #Inference
+opt.faust = "INTRA"
+script.main(opt, trainer.network) #Inference

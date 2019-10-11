@@ -108,13 +108,10 @@ def main(opt, network):
                     inputB=os.path.join(opt.dataset_path, "test_scan_112.ply"), path="155_112.txt")
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_156.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_014.ply"), path="156_014.txt")
-
-        # aqui
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_158.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_187.ply"), path="158_187.txt")
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_161.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_103.ply"), path="161_103.txt")
-        # aqui
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_166.ply"),
                     inputB=os.path.join(opt.dataset_path, "test_scan_037.ply"), path="166_037.txt")
         inf.forward(inputA=os.path.join(opt.dataset_path, "test_scan_167.ply"),

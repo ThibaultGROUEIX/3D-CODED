@@ -14,20 +14,20 @@ opt = parser()
 class Experiments(object):
     def __init__(self):
         self.inference = {
-            0: "python inference/script.py --dir_name learning_elementary_structure_trained_models/0point_translation --HR 1 --faust INTER",
-            1: "python inference/script.py --dir_name learning_elementary_structure_trained_models/1patch_deformation --HR 1 --faust INTER",
-            2: "python inference/script.py --dir_name learning_elementary_structure_trained_models/2point_translation_and_patch_deformation --HR 1 --faust INTER",
-            3: "python inference/script.py --dir_name learning_elementary_structure_trained_models/3D_CODED --HR 1 --faust INTER",
-            4: "python inference/script.py --dir_name learning_elementary_structure_trained_models/0point_translation --HR 1 --faust INTRA",
-            5: "python inference/script.py --dir_name learning_elementary_structure_trained_models/1patch_deformation --HR 1 --faust INTRA",
-            6: "python inference/script.py --dir_name learning_elementary_structure_trained_models/2point_translation_and_patch_deformation --HR 1 --faust INTRA",
-            7: "python inference/script.py --dir_name learning_elementary_structure_trained_models/3D_CODED --HR 1 --faust INTRA",
+            0: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/0Translation --HR 1 --faust INTER",
+            1: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/1Deformation --HR 1 --faust INTER",
+            2: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/2DeformationTranslation --HR 1 --faust INTER",
+            3: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/3D_CODED --HR 1 --faust INTER",
+            4: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/0Translation --HR 1 --faust INTRA",
+            5: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/1Deformation --HR 1 --faust INTRA",
+            6: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/2DeformationTranslation --HR 1 --faust INTRA",
+            7: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/3D_CODED --HR 1 --faust INTRA",
         }
         self.trainings = {
-            0: "python training/train.py --id 0 --point_translation 0 --patch_deformation 1",
-            1: "python training/train.py --id 1 --point_translation 0 --patch_deformation 1",
-            2: "python training/train.py --id 2 --point_translation 0 --patch_deformation 0",
-            3: "python training/train.py --id 3 --point_translation 1 --patch_deformation 1",
+            # 0: "python training/train.py --id 0 --point_translation 0  /--patch_deformation 1",
+            1: "python training/train.py --id 1 --point_translation 1 --patch_deformation 0",
+            # 2: "python training/train.py --id 2 --point_translation 0 --patch_deformation 0",
+            # 3: "python training/train.py --id 3 --point_translation 1 --patch_deformation 1",
         }
 
 exp = Experiments()

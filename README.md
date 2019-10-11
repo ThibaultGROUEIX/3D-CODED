@@ -16,24 +16,12 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 <details><summary>Faust results</summary>
 
 
-| Method |L2 loss SURREAL| Faust Intra results |  Faust Inter results |
-| ------------------------------------------ | ----- |  ----- |  ----- |
-| **3D-CODED**                               | 1.487 | 1.978 |2.804 |
-| **Points Translation**                      | 1.204 | **1.689** |2.687 |
-| **Patch Deformation**                                 |1.317|  1.822 | 2.636 |
-|  **Points Translation + Patch Deformation** |1.318| 1.727|  **2.594**  |
-|  **Points Translation + Patch Deformation + RotInvY** |-|  - |  2.962     |
-
-
-
-Updated--
-
-| Method                                               | L2 loss SURREAL | Faust Intra results | Faust Inter results |
-| ---------------------------------------------------- | --------------- | ------------------- | ------------------- |
-| **3D-CODED**                                         | 1.364 (1.157)               | -              |2.841               |
-| **Points Translation**                               | 1.387 (0.995)  | -           | 2.69      |
-| **Patch Deformation**                                | 2.101 (1.427)               |-               | 3.395        |
-| **Points Translation + Patch Deformation**           | 2.221 (1238) |-              | 36       |
+| Method                                               | L2 Train SURREAL | L2 Val SURREAL | Faust Intra results | Faust Inter results |
+| ---------------------------------------------------- | --------------- |  --------------- | ------------------- | ------------------- |
+| **3D-CODED**                                         | 1.098 | 1.315   | 1.747         |2.641               |
+| **Points Translation**                              |9.980 | 1.263 | **1.626** | 2.714 |
+| **Patch Deformation**                             | 1.028| 1.436      |1.742               | **2.578**    |
+| **Points Translation + Patch Deformation**           |**0.969**| **1.173 ** |1.676              | 2.779       |
 
 
 
@@ -59,7 +47,7 @@ This implementation uses [Pytorch](http://pytorch.org/).
 
 ```shell
 git clone https://github.com/ThibaultGROUEIX/3D-CODED.git ## Download the repo
-git submodule update --init
+cd 3D-CODED; git submodule update --init
 conda env create -f 3D-CODED-ENV.yml ## Create python env
 source activate pytorch-3D-CODED
 cd ./extension; python setup.py install; cd ..

@@ -234,9 +234,7 @@ class AE_AtlasNet_Humans(nn.Module):
         div = 20
         batch = int(self.template[0].num_vertex_HR / div)
         for i in range(div - 1):
-            rand_grid = self.template[0].template_learned_HR[batch * i:batch * (i + 1)].view(x.size(0), batch,
-                                                                                   self.dim_template).transpose(1,
-                                                                                                                2).contiguous()
+            rand_grid = self.template[0].template_learned_HR[batch * i:batch * (i + 1)].view(x.size(0), batch,self.dim_template).transpose(1,2).contiguous()
             y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
             y = torch.cat((rand_grid, y), 1).contiguous()
             outs.append(self.decoder[0](y))
@@ -271,11 +269,10 @@ class AE_AtlasNet_Humans(nn.Module):
         import pymesh
         if not(self.point_translation or self.patch_deformation):
             self.template[0].template_learned_HR = self.template[0].vertex_HR
-            return
+
         if self.patch_deformation:
             templates = self.get_patch_deformation_template(high_res = True)
             self.template[0].template_learned_HR = templates[0]
-            return
 
         if self.point_translation:
             templates = self.get_points_translation_template()
