@@ -4,5 +4,5 @@ function gdrive_download () {
   wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$CONFIRM&id=$1" -O $2
   rm -rf /tmp/cookies.txt
 }
-gdrive_download 1KaxG6jbpcDhD-TexfvzQ_YqcuXEQKKPv learning_elementary_structure_trained_models.zip # Test files
+gdrive_download 1mtQcX9YuaRgOhIhHE9JZlhDH9NcwJ_6H learning_elementary_structure_trained_models.zip # Test files
 unzip learning_elementary_structure_trained_models.zip

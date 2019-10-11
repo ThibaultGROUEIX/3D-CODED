@@ -4,7 +4,7 @@ import trimesh
 import os
 import torch
 from termcolor import colored
-
+import pymesh
 
 def grey_print(x):
     print(colored(x, "grey"))
@@ -115,6 +115,12 @@ def scale(input_mesh, mesh_ref):
     area = np.power(mesh_ref.volume / input_mesh.volume, 1.0/3)
     mesh= trimesh.Trimesh( vertices =  input_mesh.vertices * area, faces= input_mesh.faces, process = False)
     return mesh, area
+
+
+def uniformize(input):
+    input = pymesh.form_mesh(input.vertices, input.faces)
+    input, _ = pymesh.split_long_edges(input, 0.005)
+    return input
 
 def rot(input_mesh,  theta = np.pi/2):
     # rotation around X axis of angle theta

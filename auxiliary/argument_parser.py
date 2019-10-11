@@ -42,12 +42,13 @@ def parser():
     parser.add_argument('--port', type=int, default=8889, help='visdom port')
     parser.add_argument('--dir_name', type=str, default="",  help='dirname')
     parser.add_argument('--dataset_path', type=str, default = './export/',  help='your path to the trained model')
+    parser.add_argument('--dest_folder', type=str, default = './html/',  help='your path to the trained model')
 
     # Network
     parser.add_argument('--model', type=str, default='', help='optional reload model path')
     parser.add_argument('--point_translation', type=int, default=0, help='point_translation')
     parser.add_argument('--dim_template', type=int, default=3, help='dim_template')
-    parser.add_argument('--patch_deformation', type=int, default=0, help='patch_deformation')
+    parser.add_argument('--patch_deformation', type=int, default=1, help='patch_deformation')
     parser.add_argument('--dim_out_patch', type=int, default=3, help='dim_out_patch')
     parser.add_argument('--start_from', type=str, default="TEMPLATE", choices=["TEMPLATE, SOUP, TRAINDATA"] ,help='dim_out_patch')
 
@@ -70,6 +71,7 @@ def parser():
     parser.add_argument('--clean', type=int, default=1, help='if 1, remove points that dont belong to any edges')
     parser.add_argument('--scale', type=int, default=1, help='if 1, scale input mesh to have same volume as the template')
     parser.add_argument('--project_on_target', type=int, default=0,  help='if 1, projects predicted correspondences point on target mesh')
+    parser.add_argument('--uniformize', type=int, default=1, help='if 1, scale input mesh to have same volume as the template')
 
     opt = parser.parse_args()
 
@@ -84,6 +86,7 @@ def parser():
     opt.display = my_utils.int_2_boolean(opt.display)
     opt.point_translation = my_utils.int_2_boolean(opt.point_translation)
     opt.patch_deformation = my_utils.int_2_boolean(opt.patch_deformation)
+    opt.uniformize = my_utils.int_2_boolean(opt.uniformize)
 
     opt.date = str(datetime.datetime.now())
     now = datetime.datetime.now()

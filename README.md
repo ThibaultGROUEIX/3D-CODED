@@ -16,12 +16,14 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 <details><summary>Faust results</summary>
 
 
-| Method | Faust Intra results |  Faust Inter results |
-| ------------------------------------------ | ----- |  ----- |
-| **3D-CODED**                               | 2.042 |3.047 |
-| **Points Translation**                      | 1.882 |2.971 |
-| **Patch Deformation**                                 | **1.868** | **2.788** |
-|  **Points Translation + Patch Deformation** |1.874|  3.052     |
+| Method                                               | L2 Train SURREAL | L2 Val SURREAL | Faust Intra results | Faust Inter results |
+| ---------------------------------------------------- | --------------- |  --------------- | ------------------- | ------------------- |
+| **3D-CODED**                                         | 1.098 | 1.315   | 1.747         |2.641               |
+| **Points Translation**                              |9.980 | 1.263 | **1.626** | 2.714 |
+| **Patch Deformation**                             | 1.028| 1.436      |1.742               | **2.578**    |
+| **Points Translation + Patch Deformation**           |**0.969**| **1.173 ** |1.676              | 2.779       |
+
+
 
 </details>
 
@@ -45,7 +47,7 @@ This implementation uses [Pytorch](http://pytorch.org/).
 
 ```shell
 git clone https://github.com/ThibaultGROUEIX/3D-CODED.git ## Download the repo
-git submodule update --init
+cd 3D-CODED; git submodule update --init
 conda env create -f 3D-CODED-ENV.yml ## Create python env
 source activate pytorch-3D-CODED
 cd ./extension; python setup.py install; cd ..

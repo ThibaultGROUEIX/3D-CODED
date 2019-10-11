@@ -40,6 +40,9 @@ class Trainer(AbstractTrainer):
             network.load_state_dict(torch.load(self.opt.model))
 
         self.network = network
+        self.network.eval()
+        self.network.save_template_png(self.opt.dir_name)
+        # self.network.train()
 
     def build_optimizer(self):
         """
@@ -96,6 +99,8 @@ class Trainer(AbstractTrainer):
                 self.visualizer.show_pointclouds(points=self.network.template[0].vertex, title=f"template0")
             if self.opt.patch_deformation and self.opt.dim_out_patch == 3:
                 template = self.network.get_patch_deformation_template()
+                self.network.train() #Add this or the training keeps going in eval mode!
+                print("Network in TRAIN mode!")
                 self.visualizer.show_pointclouds(points=template[0], title=f"template_deformed0")
         self.print_iteration_stats(loss_train_total)
 
@@ -154,6 +159,8 @@ class Trainer(AbstractTrainer):
         while True:
             self.increment_iteration()
             try:
+                # if self.iteration > 10:
+                #     break
                 points, _, _, _ = iterator.next()
                 points = points.transpose(2, 1).contiguous()
                 points = points.cuda()

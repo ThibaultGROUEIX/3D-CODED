@@ -159,6 +159,10 @@ class AbstractTrainer(object):
         """
         print stats at each iteration
         """
+        current_time = time.time()
+        ellpased_time = current_time - self.start_train_time
+        total_time_estimated = self.opt.nepoch * (self.len_dataset/self.opt.batch_size) * ellpased_time / (0.00001 + self.iteration + 1.0 * self.epoch * self.len_dataset/self.opt.batch_size) # regle de 3
+        ETL = total_time_estimated - ellpased_time
         print(
             f"\r["
             + colored(f"{self.epoch}", "cyan")
@@ -167,9 +171,12 @@ class AbstractTrainer(object):
             + "/"
             + colored(f"{int(self.len_dataset/self.opt.batch_size)}", "red")
             + "] train loss:  "
-            + colored(f"{loss.item()}", "yellow"),
+            + colored(f"{loss.item()} ", "yellow")
+            + colored(f"Ellapsed Time: {ellpased_time/60/60}h ", "cyan")
+            + colored(f"ETL: {ETL/60/60}h", "red"),
             end="",
         )
+
 
     def train_iteration(self):
         pass

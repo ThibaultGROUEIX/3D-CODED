@@ -159,6 +159,7 @@ class GetTemplate(object):
 
 
 
+
 class AE_AtlasNet_Humans(nn.Module):
     def __init__(self, num_points=6890, bottleneck_size=1024, point_translation=False, dim_template=3,
                  patch_deformation=False, dim_out_patch=3, start_from="TEMPLATE", dataset_train=None):
@@ -177,12 +178,11 @@ class AE_AtlasNet_Humans(nn.Module):
         self.template = [GetTemplate(start_from, dataset_train)]
         if point_translation:
             if dim_template > 3:
-                self.template[0].vertex = torch.cat([self.template[0].vertex, torch.zeros(
-                        (self.template[0].vertex.size(0), self.dim_template - 3)).cuda()], -1)
+                self.template[0].vertex = torch.cat([self.template[0].vertex, torch.zeros((self.template[0].vertex.size(0), self.dim_template - 3)).cuda()], -1)
                 self.dim_before_decoder = dim_template
 
-            self.template[0].vertex = torch.nn.Parameter(self.template[0].vertex)
-            self.register_parameter("template_vertex_" + str(0), self.template[0].vertex)
+            self.template[0].vertex_trans = torch.nn.Parameter(self.template[0].vertex.clone().zero_())
+            self.register_parameter("template_vertex_" + str(0), self.template[0].vertex_trans)
 
         if patch_deformation:
             self.dim_before_decoder = dim_out_patch
@@ -210,6 +210,13 @@ class AE_AtlasNet_Humans(nn.Module):
 
         if self.patch_deformation:
             rand_grid = self.templateDiscovery[0](rand_grid)
+        if self.point_translation:
+            if idx is None:
+                trans = self.template[0].vertex_trans.unsqueeze(0).transpose(1,2).contiguous().expand(x.size(0), self.dim_template, -1)
+            else:
+                trans = self.template[0].vertex_trans[idx, :].view(x.size(0), -1, self.dim_template).transpose(1,2).contiguous()
+            rand_grid = rand_grid + trans
+
         y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
         y = torch.cat((rand_grid, y), 1).contiguous()
         return self.decoder[0](y).contiguous().transpose(2, 1).contiguous()  # batch, 1, 3, num_point
@@ -223,24 +230,17 @@ class AE_AtlasNet_Humans(nn.Module):
         return self.decode(x, idx)
 
     def decode_full(self, x):
-
         outs = []
         div = 20
         batch = int(self.template[0].num_vertex_HR / div)
         for i in range(div - 1):
-            rand_grid = self.template[0].vertex_HR[batch * i:batch * (i + 1)].view(x.size(0), batch,
-                                                                                   self.dim_template).transpose(1,
-                                                                                                                2).contiguous()
-            if self.patch_deformation:
-                rand_grid = self.templateDiscovery[0](rand_grid)
+            rand_grid = self.template[0].template_learned_HR[batch * i:batch * (i + 1)].view(x.size(0), batch,self.dim_template).transpose(1,2).contiguous()
             y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
             y = torch.cat((rand_grid, y), 1).contiguous()
             outs.append(self.decoder[0](y))
             torch.cuda.synchronize()
         i = div - 1
-        rand_grid = self.template[0].vertex_HR[batch * i:].view(x.size(0), -1, self.dim_template).transpose(1,2).contiguous()
-        if self.patch_deformation:
-            rand_grid = self.templateDiscovery[0](rand_grid)
+        rand_grid = self.template[0].template_learned_HR[batch * i:].view(x.size(0), -1, self.dim_template).transpose(1,2).contiguous()
         y = x.unsqueeze(2).expand(x.size(0), x.size(1), rand_grid.size(2)).contiguous()
         y = torch.cat((rand_grid, y), 1).contiguous()
         outs.append(self.decoder[0](y))
@@ -248,10 +248,18 @@ class AE_AtlasNet_Humans(nn.Module):
         return torch.cat(outs, 2).contiguous().transpose(2, 1).contiguous()
 
     def get_points_translation_template(self):
-        return [self.template[0].vertex]
+        base_shape = self.template[0].vertex
+        if self.patch_deformation:
+            base_shape = self.get_patch_deformation_template()[0]
+        return [base_shape+self.template[0].vertex_trans]
 
-    def get_patch_deformation_template(self):
-        rand_grid = self.template[0].vertex.transpose(0, 1).contiguous().unsqueeze(0).expand(1, self.dim_template,-1)
+    def get_patch_deformation_template(self, high_res = False):
+        self.eval()
+        print("WARNING: the network is now in eval mode!")
+        if high_res:
+            rand_grid = self.template[0].vertex_HR.transpose(0, 1).contiguous().unsqueeze(0).expand(1, self.dim_template,-1)
+        else:
+            rand_grid = self.template[0].vertex.transpose(0, 1).contiguous().unsqueeze(0).expand(1, self.dim_template,-1)
         return [self.templateDiscovery[0](rand_grid).squeeze().transpose(1, 0).contiguous()]
 
     def make_high_res_template_from_low_res(self):
@@ -259,21 +267,31 @@ class AE_AtlasNet_Humans(nn.Module):
         This function takes a path to the orginal shapenet model and subsample it nicely
         """
         import pymesh
-        templates = self.get_points_translation_template()
-        if self.dim_template == 3:
-            template_points = templates[0].cpu().clone().detach().numpy()
-            obj1 = pymesh.form_mesh(vertices=template_points, faces=self.template[0].mesh.faces)
-            if len(obj1.vertices)<100000:
-                obj1 = pymesh.split_long_edges(obj1, 0.02)[0]
-                while len(obj1.vertices)<100000:
-                    obj1 = pymesh.subdivide(obj1)
-            self.template[0].mesh_HR = obj1
-            self.template[0].mesh_HR = obj1
-            self.template[0].vertex_HR = torch.from_numpy(obj1.vertices).cuda().float()
-            self.template[0].num_vertex_HR = self.template[0].vertex_HR.size(0)
-            print(f"Make high res template with {self.template[0].num_vertex_HR} points.")
+        if not(self.point_translation or self.patch_deformation):
+            self.template[0].template_learned_HR = self.template[0].vertex_HR
+
+        if self.patch_deformation:
+            templates = self.get_patch_deformation_template(high_res = True)
+            self.template[0].template_learned_HR = templates[0]
+
+        if self.point_translation:
+            templates = self.get_points_translation_template()
+
+            if self.dim_template == 3:
+                template_points = templates[0].cpu().clone().detach().numpy()
+                obj1 = pymesh.form_mesh(vertices=template_points, faces=self.template[0].mesh.faces)
+                if len(obj1.vertices)<100000:
+                    obj1 = pymesh.split_long_edges(obj1, 0.02)[0]
+                    while len(obj1.vertices)<100000:
+                        obj1 = pymesh.subdivide(obj1)
+                self.template[0].mesh_HR = obj1
+                self.template[0].template_learned_HR = torch.from_numpy(obj1.vertices).cuda().float()
+                self.template[0].num_vertex_HR = self.template[0].template_learned_HR.size(0)
+                print(f"Make high res template with {self.template[0].num_vertex_HR} points.")
 
     def save_template_png(self, path):
+        print("Saving template...")
+        self.eval()
         if self.point_translation:
             templates = self.get_points_translation_template()
             if self.dim_template == 3:
