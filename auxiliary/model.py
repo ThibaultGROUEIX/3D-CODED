@@ -176,19 +176,25 @@ class AE_AtlasNet_Humans(nn.Module):
         self.dataset_train = dataset_train
 
         self.template = [GetTemplate(start_from, dataset_train)]
-        if point_translation:
-            if dim_template > 3:
-                self.template[0].vertex = torch.cat([self.template[0].vertex, torch.zeros((self.template[0].vertex.size(0), self.dim_template - 3)).cuda()], -1)
-                self.dim_before_decoder = dim_template
 
-            self.template[0].vertex_trans = torch.nn.Parameter(self.template[0].vertex.clone().zero_())
-            self.register_parameter("template_vertex_" + str(0), self.template[0].vertex_trans)
+        self.dim_before_decoder = dim_template
+
+        if self.dim_template > 3:
+            self.template[0].vertex = torch.cat([self.template[0].vertex, torch.zeros((self.template[0].vertex.size(0), self.dim_template - 3)).cuda()], -1)
+            self.template[0].vertex_HR = torch.cat([self.template[0].vertex_HR, torch.zeros((self.template[0].vertex_HR.size(0), self.dim_template - 3)).cuda()], -1)
+        elif self.dim_template == 2:
+            self.template[0].vertex = self.template[0].vertex[:,:2] #projection on Z=0 plane
+            self.template[0].vertex_HR = self.template[0].vertex_HR[:,:2] #projection on Z=0 plane
+
 
         if patch_deformation:
             self.dim_before_decoder = dim_out_patch
             self.templateDiscovery = nn.ModuleList(
                 [patchDeformationMLP(patchDim=dim_template, patchDeformDim=dim_out_patch, tanh=True)])
 
+        if point_translation:
+            self.template[0].vertex_trans = torch.nn.Parameter(self.template[0].vertex.clone().zero_())
+            self.register_parameter("template_vertex_" + str(0), self.template[0].vertex_trans)
 
         self.encoder = PointNetfeat(num_points, bottleneck_size)
         self.decoder = nn.ModuleList(
@@ -288,6 +294,25 @@ class AE_AtlasNet_Humans(nn.Module):
                 self.template[0].template_learned_HR = torch.from_numpy(obj1.vertices).cuda().float()
                 self.template[0].num_vertex_HR = self.template[0].template_learned_HR.size(0)
                 print(f"Make high res template with {self.template[0].num_vertex_HR} points.")
+            elif self.dim_template == 2:
+                templates = templates[0]
+                templates = torch.cat([templates, torch.zeros((templates.size(0), 1)).cuda()], -1)
+                template_points = templates.cpu().clone().detach().numpy()
+                obj1 = pymesh.form_mesh(vertices=template_points, faces=self.template[0].mesh.faces)
+                if len(obj1.vertices)<100000:
+                    obj1 = pymesh.split_long_edges(obj1, 0.02)[0]
+                    while len(obj1.vertices)<100000:
+                        obj1 = pymesh.subdivide(obj1)
+                self.template[0].mesh_HR = obj1
+                self.template[0].template_learned_HR = torch.from_numpy(obj1.vertices).cuda().float()[:,:2].contiguous()
+                self.template[0].num_vertex_HR = self.template[0].template_learned_HR.size(0)
+                print(f"Make high res template with {self.template[0].num_vertex_HR} points.")
+            else:
+                template_points = templates[0].cpu().clone().detach().numpy()
+                self.template[0].mesh_HR = self.template[0].mesh
+                self.template[0].template_learned_HR = torch.from_numpy(template_points).cuda().float()
+                self.template[0].num_vertex_HR = self.template[0].template_learned_HR.size(0)
+                print(f"Can't do high-res because we are in {self.dim_template}D.")
 
     def save_template_png(self, path):
         print("Saving template...")

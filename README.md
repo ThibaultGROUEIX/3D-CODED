@@ -19,9 +19,13 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 | Method                                               | L2 Train SURREAL | L2 Val SURREAL | Faust Intra results | Faust Inter results |
 | ---------------------------------------------------- | --------------- |  --------------- | ------------------- | ------------------- |
 | **3D-CODED**                                         | 1.098 | 1.315   | 1.747         |2.641               |
-| **Points Translation**                              |9.980 | 1.263 | **1.626** | 2.714 |
-| **Patch Deformation**                             | 1.028| 1.436      |1.742               | **2.578**    |
-| **Points Translation + Patch Deformation**           |**0.969**| **1.173 ** |1.676              | 2.779       |
+| **Points Translation 3D**                              |9.980 | 1.263 | **1.626** | 2.714 |
+| **Patch Deformation  3D**                             | 1.028| 1.436      |1.742               | **2.578**    |
+| **Points Translation + Patch Deformation 3D**           |**0.969**| **1.173 ** |1.676              | 2.779       |
+| **Points Translation 2D**                              | 1.09 | 1.54 | 2.054 | 3.005 |
+| **Patch Deformation 2D**                             | 6.354            | 6.767          | 4.46                | 5.420               |
+| **Points Translation 10D**                              | **0.906**        | **1.064**      | 1.799               | 2.707               |
+| **Patch Deformation  10D**                             | 0.952            | 1.183          | 1.683               | 2.83                |
 
 
 

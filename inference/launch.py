@@ -24,10 +24,14 @@ class Experiments(object):
             7: "python inference/script.py --dir_name learning_elementary_structure_trained_models_2/3D_CODED --HR 1 --faust INTRA",
         }
         self.trainings = {
-            # 0: "python training/train.py --id 0 --point_translation 0  /--patch_deformation 1",
+            0: "python training/train.py --id 0 --point_translation 0  /--patch_deformation 1",
             1: "python training/train.py --id 1 --point_translation 1 --patch_deformation 0",
-            # 2: "python training/train.py --id 2 --point_translation 0 --patch_deformation 0",
-            # 3: "python training/train.py --id 3 --point_translation 1 --patch_deformation 1",
+            2: "python training/train.py --id 2 --point_translation 0 --patch_deformation 0",
+            3: "python training/train.py --id 3 --point_translation 1 --patch_deformation 1",
+            4: "python training/train.py --id 4 --point_translation 1 --patch_deformation 0 --dim_template 2 --dim_out_patch 2",
+            5: "python training/train.py --id 4 --point_translation 1 --patch_deformation 0 --dim_template 10 --dim_out_patch 10",
+            6: "python training/train.py --id 4 --point_translation 0 --patch_deformation 1 --dim_template 2 --dim_out_patch 2",
+            7: "python training/train.py --id 4 --point_translation 0 --patch_deformation 1 --dim_template 10 --dim_out_patch 10",
         }
 
 exp = Experiments()
