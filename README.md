@@ -28,7 +28,6 @@ In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
 | **Patch Deformation  10D**                             | 0.952            | 1.183          | 1.683               | 2.83                |
 
 
-
 </details>
 
 
