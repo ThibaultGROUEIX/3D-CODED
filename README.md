@@ -136,7 +136,7 @@ You need to make sure your meshes are preprocessed correctly :
 
 
 ```shell
-python ./training/train_sup.py
+python ./training/train.py
 ```
 
 <details><summary> Trainer's Options</summary>
