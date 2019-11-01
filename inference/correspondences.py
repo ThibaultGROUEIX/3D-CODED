@@ -400,6 +400,8 @@ if __name__ == '__main__':
     my_utils.plant_seeds(randomized_seed=opt.randomize)
     trainer = trainer.Trainer(opt)
     trainer.build_network()
+    trainer.network.make_high_res_template_from_low_res()
+
     my_utils.plant_seeds(randomized_seed=opt.randomize)
     inf = Inference(HR=opt.HR, reg_num_steps=opt.reg_num_steps, num_points=opt.number_points,
                     num_angles=opt.num_angles, clean=opt.clean, scale=opt.scale,
