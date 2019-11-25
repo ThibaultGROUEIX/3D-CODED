@@ -6,7 +6,7 @@
 In [ECCV, 2018](http://openaccess.thecvf.com/ECCV2018.py).
 
  **Learning elementary structures for 3D shape generation and matching** <br>Theo Deprelle, Thibault Groueix,  Matthew Fisher, Vladimir G. Kim , Bryan C. Russell, Mathieu Aubry  <br>
-In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2).
+In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2). [Official Code](https://github.com/TheoDEPRELLE/AtlasNetV2)
 
 <details open><summary>Learned templates</summary>
 
