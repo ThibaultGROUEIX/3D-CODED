@@ -116,7 +116,7 @@ You need to make sure your meshes are preprocessed correctly :
 
 --> Failure modes instruction : :warning:
 
-- Sometimes the reconstruction is flipped, which break the correspondences. In the easiest case where you meshes are registered in the same orientation, you can just fix this angle in ```reconstruct.py``` line 86, to avoid the flipping problem. Also note from this line that the angle search only looks in [-90°,+90°].
+- Sometimes the reconstruction is flipped, which break the correspondences. In the easiest case where you meshes are registered in the same orientation, you can just fix this angle in ```correspondence.py``` line 240, to avoid the flipping problem. Also note from this line that the angle search only looks in [-90°,+90°].
 
 - Check the presence of lonely outliers that break the Pointnet encoder. You could try to remove them with the ```--clean``` flag.
 
