@@ -195,7 +195,7 @@ If you find this work useful in your research, please consider citing:
           title = {3D-CODED : 3D Correspondences by Deep Deformation},
           author={Groueix, Thibault and Fisher, Matthew and Kim, Vladimir G. and Russell, Bryan and Aubry, Mathieu},
           booktitle = {ECCV},
-          year = 2018}
+          year = {2018}
         }
 ```
 
