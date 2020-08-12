@@ -58,7 +58,7 @@ pip install http://imagine.enpc.fr/~langloip/data/pymesh2-0.2.1-cp37-cp37m-linux
 
 
 
-## Demo :train2:  [Trained Models](https://drive.google.com/file/d/1ZAjOuTaeDrKJbFffzLnLn_K-C86fYCXs/view)
+## Demo :train2: and Inference [Trained Models](https://drive.google.com/file/d/1ZAjOuTaeDrKJbFffzLnLn_K-C86fYCXs/view)
 
 ```shell
 python inference/correspondences.py --dir_name learning_elementary_structure_trained_models/1patch_deformation
