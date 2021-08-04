@@ -143,7 +143,7 @@ class Trainer(AbstractTrainer):
 
         self.log.update("loss_val_Deformation_ChamferL2", loss_val_Deformation_ChamferL2)
         print(
-            '\r' + colored('[%d: %d/%d]' % (self.epoch, self.iteration, self.len_dataset_test / (self.opt.batch_size)),
+            '\r' + colored('[%d: %d/%d]' % (self.epoch, self.iteration, len(self.dataloader_test)),
                            'red') +
             colored('loss_val_Deformation_ChamferL2:  %f' % loss_val_Deformation_ChamferL2.item(), 'yellow'),
             end='')
