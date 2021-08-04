@@ -161,7 +161,7 @@ class AbstractTrainer(object):
         """
         current_time = time.time()
         ellpased_time = current_time - self.start_train_time
-        total_time_estimated = self.opt.nepoch * (self.len_dataset/self.opt.batch_size) * ellpased_time / (0.00001 + self.iteration + 1.0 * self.epoch * self.len_dataset/self.opt.batch_size) # regle de 3
+        total_time_estimated = self.opt.nepoch * len(self.dataloader_train) * ellpased_time / (0.00001 + self.iteration + 1.0 * self.epoch * self.len_dataset/self.opt.batch_size) # regle de 3
         ETL = total_time_estimated - ellpased_time
         print(
             f"\r["
@@ -169,7 +169,7 @@ class AbstractTrainer(object):
             + f": "
             + colored(f"{self.iteration}", "red")
             + "/"
-            + colored(f"{int(self.len_dataset/self.opt.batch_size)}", "red")
+            + colored(f"{len(self.dataloader_train)}", "red")
             + "] train loss:  "
             + colored(f"{loss.item()} ", "yellow")
             + colored(f"Ellapsed Time: {ellpased_time/60/60}h ", "cyan")
