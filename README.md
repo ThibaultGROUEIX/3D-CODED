@@ -8,6 +8,16 @@ In [ECCV, 2018](http://openaccess.thecvf.com/ECCV2018.py).
  **Learning elementary structures for 3D shape generation and matching** <br>Theo Deprelle, Thibault Groueix,  Matthew Fisher, Vladimir G. Kim , Bryan C. Russell, Mathieu Aubry  <br>
 In [Neurips, 2019](https://neurips.cc/Register2?showPanel=2). [Official Code](https://github.com/TheoDEPRELLE/AtlasNetV2)
 
+
+## A note on data.
+
+Data download should be automatic. However, due to the new google drive traffic caps, you may have to download manually. If you run into an error during the data download, you can refer to https://github.com/ThibaultGROUEIX/AtlasNet/issues/61.
+
+You can manually download the data from these sources :
+* Google drive **datas_surreal_test.pth**: https://drive.google.com/file/d/1VGax9j64AvCVORtiQ3ZSPecI0bfZrEVe/view?usp=sharing
+* Google drive **datas_surreal_train.pth**: https://drive.google.com/file/d/1HVReM43YtJqhGfbmE58dc1-edI_oz9YG/view?usp=sharing
+__________________________________________________
+
 <details open><summary>Learned templates</summary>
 
 
