@@ -89,8 +89,7 @@ class Inference(object):
             idx_knn = self.neigh.kneighbors(source.vertices, return_distance=False)
 
             # correspondances throught template
-            closest_points = target_reconstructed.vertices[idx_knn]
-            closest_points = np.mean(closest_points, 1, keepdims=False)
+            closest_points = target_reconstructed.vertices[idx_knn].squeeze()
 
             # project on target
             if self.project_on_target:
